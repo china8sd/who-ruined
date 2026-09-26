@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Who Ruined — Dota 2 Match Analyzer</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div class="bg"></div>
+<main class="app">
+  <header>
+    <div class="eyebrow">DOTA 2 / MATCH FORENSICS</div>
+    <h1>WHO <span>RUINED?</span></h1>
+    <p class="lead">Разбор поражения по Match ID. Не просто KDA — контекст, ключевые ошибки и влияние каждого игрока.</p>
+    <form id="form" class="search">
+      <input id="matchId" inputmode="numeric" placeholder="Введи Match ID" required>
+      <button>АНАЛИЗИРОВАТЬ</button>
+    </form>
+    <a class="telegram" href="https://t.me/chinasd787" target="_blank" rel="noopener noreferrer"><span class="telegramIcon">➤</span> Открыть Telegram</a><span class="authorCaption">автор проекта · Telegram</span><div id="status" class="status"></div>
+  </header>
+
+  <section id="result" class="hidden">
+    <div class="verdict">
+      <div class="eyebrow">VERDICT</div>
+      <div class="verdict-grid">
+        <div>
+          <div class="verdictHero"><img id="culpritHero" src="" alt=""></div><div class="verdictRank"><img id="culpritRank" src="" alt=""><span id="culpritRankText">—</span></div>
+          <h2 id="culpritName">—</h2>
+          <div class="impact"><span class="impactLabel">Влияние на поражение</span><b id="culpritScore" class="impactValue">—</b></div>
+          <div id="confidence" class="confidence">Confidence —</div>
+        </div>
+        <div id="summary" class="summary"></div>
+      </div>
+      <div class="nearRuiner" id="nearRuiner"></div>
+    </div>
+
+    <div class="panel wide"><div class="panel-title">Матч в цифрах</div><div id="matchOverview"></div></div>
+    <div class="panel wide storyPanel">
+      <div class="panel-title">Как развивалась игра</div>
+      <div id="matchStory"></div>
+    </div>
+
+    <div class="grid">
+      <div class="panel wide">
+        <div class="panel-title">Игроки проигравшей команды</div>
+        <div id="players"></div>
+      </div>
+      <div class="panel">
+        <div class="panel-title">Ключевые эпизоды</div>
+        <div id="events"></div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-title">Почему именно он?</div>
+      <div id="reasons" class="reasons"></div>
+    </div>
+  </section>
+</main>
+<script src="js/app.js"></script>
+</body>
+</html>
