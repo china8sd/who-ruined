@@ -166,6 +166,10 @@ function render(m,all,players,culprit,closeRuiner){
  $("summary").innerHTML=verdictText(m,culprit,closeRuiner);
  $("nearRuiner").innerHTML=closeRuiner?nearRuinerHtml(closeRuiner):'<div class="nearEmpty">Второй игрок не набрал достаточно сигналов для отдельного сравнения.</div>';
  $("matchOverview").innerHTML=overview(m,all);
+ const winningTeam=m.radiant_win?"Radiant":"Dire";
+ const winningPlayers=all.filter(p=>p.team===winningTeam).map(p=>({...p,roleInfo:inferRole(p,all.filter(x=>x.team===winningTeam),m.duration||1)}));
+ $("winnerTeamName").textContent=`${winningTeam} · ${m.radiant_win?fmt(m.radiant_score):fmt(m.dire_score)} : ${m.radiant_win?fmt(m.dire_score):fmt(m.radiant_score)}`;
+ $("winnerTeam").innerHTML=winningPlayers.map(p=>winnerPlayerCard(p)).join("");
  $("players").innerHTML=players.map((p)=>playerCard(p,p===culprit)).join("");
  const events=buildEvents(m,culprit); $("events").innerHTML=events.length?events.map(e=>`<div class="event ${e.danger?'danger':''}"><div class="eventTop"><span class="eventTime">${e.t}</span><span class="eventTag ${e.danger?'bad':''}">${e.danger?'НЕГАТИВНЫЙ СИГНАЛ':'ПОЛОЖИТЕЛЬНЫЙ СИГНАЛ'}</span></div><div class="eventPlayer"><img src="${e.player?.img||''}" alt="" onerror="this.style.visibility='hidden'"><div><strong>${esc(e.player?.name||'Игрок')}</strong><span>${esc(e.player?.hero||'Герой')}</span></div></div><b>${esc(e.title)}</b><div class="eventWhat"><strong>Что произошло:</strong> ${esc(e.text)}</div><div class="eventWhy"><strong>Почему это важно:</strong> ${esc(e.why)}</div></div>`).join(""):`<div class="empty">Для этого матча parsed event data недостаточно.</div>`;
  $("reasons").innerHTML=culprit.reasons.map(r=>`<div class="reason"><strong>+ ${esc(r[0])}</strong><span>${esc(r[1])}</span></div>`).join("");
@@ -250,6 +254,11 @@ function overview(m,all){
  const rad=all.filter(p=>p.team==='Radiant'),dire=all.filter(p=>p.team==='Dire');
  const net=rad.reduce((a,p)=>a+(p.net_worth||0),0)-dire.reduce((a,p)=>a+(p.net_worth||0),0);
  return `<div class="ov"><div><span>Длительность</span><b>${time(m.duration)}</b></div><div><span>Победитель</span><b>${m.radiant_win?'Radiant':'Dire'}</b></div><div><span>Net Worth diff</span><b>${net>=0?'+':''}${fmt(net)}</b></div><div><span>Teamfights</span><b>${(m.teamfights||[]).length}</b></div><div><span>Objectives</span><b>${(m.objectives||[]).length}</b></div><div><span>Roshan</span><b>${(m.objectives||[]).filter(o=>String(o.type).toLowerCase().includes('roshan')).length}</b></div></div>`;
+}
+function winnerPlayerCard(p){
+ const kd=`${p.kills||0}/${p.deaths||0}/${p.assists||0}`;
+ const role=p.roleInfo?.role||inferRole(p,[],0).role;
+ return `<div class="winnerPlayer"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div class="winnerPlayerMain"><b>${esc(p.personaname||`Игрок ${p.idx+1}`)}</b><span>${esc(heroName(p))} · ${esc(role)}</span><small>K/D/A ${kd} · GPM ${fmt(p.gold_per_min)} · XPM ${fmt(p.xp_per_min)} · Урон ${fmt(p.hero_damage)}</small></div><strong>${fmt(p.net_worth)} NW</strong></div>`;
 }
 function playerCard(p,isCulprit){
  const kd=`${p.kills||0}/${p.deaths||0}/${p.assists||0}`, items=itemsOf(p);
