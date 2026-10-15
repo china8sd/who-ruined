@@ -2,12 +2,14 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Who Ruined — разбор поражения в Dota 2 по Match ID"><meta name="theme-color" content="#05070b">
 <title>Who Ruined — Dota 2 Match Analyzer</title>
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 <div class="bg"></div>
 <main class="app">
+  <button id="langBtn" class="langBtn" type="button" aria-label="Language">EN</button>
   <header>
     <div class="eyebrow">DOTA 2 / MATCH FORENSICS</div>
     <h1>WHO <span>RUINED?</span></h1>
@@ -16,12 +18,12 @@
       <input id="matchId" inputmode="numeric" placeholder="Введи Match ID" required>
       <button>АНАЛИЗИРОВАТЬ</button>
     </form>
-    <a class="telegram" href="https://t.me/chinasd787" target="_blank" rel="noopener noreferrer"><span class="telegramIcon">➤</span> Открыть Telegram</a><span class="authorCaption">автор проекта · Telegram</span><div id="status" class="status"></div>
+    <a class="telegram" href="https://t.me/chinasd787" target="_blank" rel="noopener noreferrer"><span class="telegramIcon">➤</span> Открыть Telegram</a><span class="authorCaption">автор проекта · Telegram</span><div id="status" class="status" role="status"></div><div id="parseNotice"></div><div id="history" class="history"></div>
   </header>
 
   <section id="result" class="hidden">
     <div class="verdict">
-      <div class="verdictTop"><div class="eyebrow ruinerEyebrow">РУИНЕР</div><button id="whyRuinerBtn" type="button" class="whyRuinerBtn">ПОЧЕМУ ИМЕННО ОН?</button></div>
+      <div class="verdictTop"><div class="eyebrow ruinerEyebrow">РУИНЕР</div><button id="whyRuinerBtn" type="button" class="whyRuinerBtn">ПОЧЕМУ ИМЕННО ОН?</button><button id="advocateBtn" type="button" class="whyRuinerBtn advBtn">АДВОКАТ</button></div>
       <div class="verdict-grid">
         <div>
           <div class="verdictHero"><img id="culpritHero" src="" alt=""></div><div class="verdictRank"><img id="culpritRank" src="" alt=""><span id="culpritRankText">—</span></div>
@@ -33,11 +35,12 @@
       </div>
       <div id="awards" class="awards verdictAwards"></div>
       <div class="nearRuiner" id="nearRuiner"></div>
+      <div id="advocate" class="advocate hidden"></div>
     </div>
 
-    <div class="panel wide resultScreen"><div class="resultScreenHead"><div><div class="eyebrow">MATCH REPORT</div><h2>Итоги матча</h2><p id="resultSubtitle">Ключевые игроки и переломные моменты</p></div><button id="shareResult" type="button" class="shareBtn">КОПИРОВАТЬ ИТОГ</button></div></div>
+    <div class="panel wide resultScreen"><div class="resultScreenHead"><div><div class="eyebrow">MATCH REPORT</div><h2>Итоги матча</h2><p id="resultSubtitle">Ключевые игроки и переломные моменты</p></div><div class="btnRow"><button id="shareResult" type="button" class="shareBtn">КОПИРОВАТЬ ИТОГ</button><button id="shareCard" type="button" class="shareBtn alt">СКАЧАТЬ КАРТОЧКУ</button></div></div></div>
     <div class="panel wide"><div class="panel-title">Матч в цифрах</div><div id="matchOverview"></div></div>
-    <div class="panel wide"><div class="panel-title">Как менялось преимущество по золоту</div><div id="goldGraph" class="goldGraph"></div><div class="graphLegend"><span><i class="radDot"></i> Radiant</span><span><i class="direDot"></i> Dire</span><small>График строится по доступным временным данным OpenDota.</small></div></div>
+    <div class="panel wide"><div class="panel-title">Как менялось преимущество по золоту</div><div id="goldGraph" class="goldGraph"></div><div class="graphLegend"><span><i class="radDot"></i> Radiant</span><span><i class="direDot"></i> Dire</span><span><i class="deathDot"></i> Смерти руинера</span><small>График строится по доступным временным данным OpenDota.</small></div></div>
     <div class="panel wide"><div class="panel-title">Сравнение с ожиданиями</div><p class="panelHint">GPM и XPM сопоставляются с контекстным ориентиром модели. Это не абсолютный рейтинг игрока.</p><div id="roleCompare" class="roleCompare"></div></div>
     <div class="panel wide winnerPanel"><div class="panel-title">Победившая команда · <span id="winnerTeamName">—</span></div><div id="winnerTeam"></div></div>
     <div class="panel wide storyPanel">
@@ -61,5 +64,6 @@
 </main>
 <div id="whyRuinerModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="whyRuinerTitle"><div class="whyModalBackdrop" data-close-why="1"></div><div class="whyModalCard"><div class="whyModalHead"><h2 id="whyRuinerTitle">Почему именно он?</h2><button id="closeWhyRuiner" type="button" class="closeWhy" aria-label="Закрыть">×</button></div><p class="whyModalIntro">Разбор основан на показателях матча и доступных игровых событиях. Это оценка модели, а не утверждение, что один игрок единолично проиграл матч.</p><div id="whyRuinerContent" class="reasons"></div></div></div>
 <script src="js/app.js"></script>
+<script src="js/extras.js"></script>
 </body>
 </html>

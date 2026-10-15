@@ -7,16 +7,18 @@ const time=s=>`${Math.floor((s||0)/60)}:${String(Math.floor((s||0)%60)).padStart
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
 let HEROES={},ITEMS={};
 
-$("form").addEventListener("submit",async e=>{
- e.preventDefault(); const id=$("matchId").value.trim(); if(!/^\d+$/.test(id))return;
- $("status").textContent="Загружаем матч, героев и предметы…"; $("result").classList.add("hidden");
+let CAL=1;
+async function run(id){
+ id=String(id||"").trim(); if(!/^\d+$/.test(id))return;
+ $("matchId").value=id; setStatus(t("Загружаем матч, героев и предметы…"),"loading"); $("result").classList.add("hidden"); $("parseNotice").innerHTML="";
  try{
-  const [mr,hr,ir]=await Promise.all([fetch(`${API}/matches/${id}`),fetch(`${API}/constants/heroes`),fetch(`${API}/constants/items`)]);
-  if(!mr.ok)throw Error("Матч не найден");
-  const m=await mr.json(); HEROES=hr.ok?await hr.json():{}; ITEMS=ir.ok?await ir.json():{};
-  await await analyze(m); $("status").textContent=`Матч ${id} обработан`;
- }catch(err){$("status").textContent="Ошибка: "+err.message}
-});
+  const [mr,h,i]=await Promise.all([fetch(`${API}/matches/${id}`),cachedJson("heroes"),cachedJson("items")]);
+  if(!mr.ok)throw httpErr(mr.status);
+  const m=await mr.json(); HEROES=h; ITEMS=i;
+  await analyze(m); setStatus(`Матч ${id} обработан`);
+ }catch(err){track("error/"+(err instanceof TypeError?"network":String(err.message).slice(0,20)));setStatus(err instanceof TypeError?t("Нет соединения с OpenDota. Проверь интернет."):err.message,"err")}
+}
+$("form").addEventListener("submit",e=>{e.preventDefault();run($("matchId").value)});
 
 function heroData(p){return HEROES[String(p.hero_id)]||HEROES[p.hero_id]||{};}
 function heroName(p){return heroData(p).localized_name||`Hero #${p.hero_id}`;}
@@ -101,11 +103,11 @@ async function analyze(m){
  const losing=m.radiant_win?"Dire":"Radiant";
  const team=players.filter(p=>p.team===losing), win=players.filter(p=>p.team!==losing);
  const teamKills=team.reduce((a,p)=>a+(p.kills||0),0), teamDamage=team.reduce((a,p)=>a+(p.hero_damage||0),0)||1;
- const duration=m.duration||1;
+ const duration=m.duration||1; CAL=rankFactor(m);
  const enriched=team.map(p=>({...p,roleInfo:inferRole(p,team,duration)}));
  const scored=enriched.map(p=>scorePlayer(p,{team:enriched,win,m,teamKills,teamDamage,duration})).sort((a,b)=>b.score-a.score);
- const culprit=scored[0];
-  const closeRuiner=scored[1]||null;
+ const pool=scored.filter(x=>!x.leaver), culprit=pool[0]||scored[0];
+  const closeRuiner=pool.find(x=>x!==culprit)||null;
  if(culprit?.account_id){
    try{
      const rr=await fetch(`${API}/players/${culprit.account_id}`);
@@ -127,8 +129,8 @@ function scorePlayer(p,c){
  let fightEvents=0, lowFightEvents=0;
  for(const f of fights){const x=f.players[p.player_slot]; if((x.kills+x.assists+x.deaths)>0)fightEvents++; if(x.deaths>0&&x.damage<500)lowFightEvents++;}
  // Role-aware expectations: supports are not judged by core farm, cores are not rescued by high KDA alone.
- const expectedGpm={"Pos 1 · Carry":520,"Pos 2 · Mid":480,"Pos 3 · Offlane":420,"Pos 4 · Soft Support":330,"Pos 5 · Hard Support":270}[role]||400;
- const expectedDamage={"Pos 1 · Carry":.23,"Pos 2 · Mid":.22,"Pos 3 · Offlane":.18,"Pos 4 · Soft Support":.11,"Pos 5 · Hard Support":.09}[role]||.17;
+ const hk=heroAdj(p,role); const expectedGpm=CAL*hk.g*({"Pos 1 · Carry":520,"Pos 2 · Mid":480,"Pos 3 · Offlane":420,"Pos 4 · Soft Support":330,"Pos 5 · Hard Support":270}[role]||400);
+ const expectedDamage=hk.d*({"Pos 1 · Carry":.23,"Pos 2 · Mid":.22,"Pos 3 · Offlane":.18,"Pos 4 · Soft Support":.11,"Pos 5 · Hard Support":.09}[role]||.17);
  const expectedKP={"Pos 1 · Carry":58,"Pos 2 · Mid":62,"Pos 3 · Offlane":62,"Pos 4 · Soft Support":66,"Pos 5 · Hard Support":68}[role]||60;
  const farmGap=clamp((expectedGpm-farm)/8,0,18);
  const damageGap=clamp((expectedDamage*100-dmgShare)*.65,0,15);
@@ -143,19 +145,20 @@ function scorePlayer(p,c){
  const utilityCredit=clamp(utility,0,10);
  // Resource-to-impact waste: high economy with weak fight/objective conversion increases blame.
  const resourceWaste=(farm>expectedGpm+80 && (dmgShare<expectedDamage*100*.72) && (p.tower_damage||0)<objectiveTarget*.7)?7:0;
+ const ix=itemSignals(p,c,role);
  const raw=100*(w.farm*(farmGap/18)+w.fight*(fightPenalty/33)+w.error*(errorPenalty/27)+w.obj*(objectivePenalty/11)+w.utility*Math.max(0,(6-utilityCredit)/6));
- const score=clamp(raw+resourceWaste,0,100);
+ const score=clamp(raw+resourceWaste+ix.reduce((a,x)=>a+x.pen,0),0,100);
  const confidence=clamp(55+(c.m.teamfights?12:0)+(c.m.objectives?8:0)+(p.gold_t?7:0)+(p.xp_t?5:0)+(p.roleInfo?.confidence||0)*.12,45,94);
- const reasons=[];
- if(farmGap>5) reasons.push([`Фарм ниже ожидания для ${role}`,`GPM ${farm}; ориентир модели ≈ ${expectedGpm}.`]);
- if(damageGap>5) reasons.push([`Низкий Fight Impact для ${role}`,`${fmt(p.hero_damage)} hero damage — ${dmgShare.toFixed(1)}% командного урона.`]);
+ const reasons=[]; ix.forEach(x=>reasons.push(x.reason));
+ if(farmGap>5) reasons.push([`Фарм ниже ожидания`,`GPM ${farm}; ориентир модели ≈ ${expectedGpm}.`]);
+ if(damageGap>5) reasons.push([`Низкий Fight Impact`,`${fmt(p.hero_damage)} hero damage — ${dmgShare.toFixed(1)}% командного урона.`]);
  if(kpGap>5) reasons.push([`Низкое участие в убийствах`,`Kill Participation ${kp.toFixed(0)}%; ориентир модели ≈ ${expectedKP}%.`]);
  if(errorPenalty>7) reasons.push([`Цена смертей слишком высока`,`${deaths} смертей с повышенным весом поздней игры.`]);
  if(resourceWaste) reasons.push([`Ресурсы не конвертированы в результат`,`Высокий GPM сочетался с низким уроном и слабым давлением на строения.`]);
- if(objectivePenalty>5) reasons.push([`Слабое давление на объекты`,`${fmt(p.tower_damage)} урона по строениям для ${role}.`]);
+ if(objectivePenalty>5) reasons.push([`Слабое давление на объекты`,`${fmt(p.tower_damage)} урона по строениям.`]);
  if(utilityCredit>4) reasons.push([`Положительный вклад поддержки`,`Вклад в вижен/лечение снижает итоговый blame.`]);
  if(!reasons.length) reasons.push([`Нет одного доминирующего провала`,`Score собран из нескольких сигналов с учётом предполагаемой роли.`]);
- return {...p,score:Math.round(score),confidence:Math.round(confidence),reasons,kp,dmgShare,role,roleConfidence:p.roleInfo?.confidence||0};
+ return {...p,leaver:(p.leaver_status||0)>=2,score:Math.round(score),confidence:Math.round(confidence),reasons,kp,dmgShare,role,roleConfidence:p.roleInfo?.confidence||0};
 }
 
 function render(m,all,players,culprit,closeRuiner){
@@ -171,19 +174,19 @@ function render(m,all,players,culprit,closeRuiner){
  const winnerPlayersForAwards=all.filter(p=>p.team===winnerTeamForAwards).map(p=>({...p,roleInfo:inferRole(p,all.filter(x=>x.team===winnerTeamForAwards),m.duration||1)}));
  const mvp=winnerPlayersForAwards.slice().sort((a,b)=>awardScore(b)-awardScore(a))[0];
  const bestLoser=players.slice().sort((a,b)=>awardScore(b)-awardScore(a))[0];
- const anti=players.slice().sort((a,b)=>b.score-a.score)[0];
+ const anti=culprit;
  $("resultSubtitle").textContent=`${time(m.duration)} · ${winnerTeamForAwards} победили со счётом ${m.radiant_win?fmt(m.radiant_score):fmt(m.dire_score)} : ${m.radiant_win?fmt(m.dire_score):fmt(m.radiant_score)}`;
  $("awards").innerHTML=[awardCard('MVP МАТЧА',mvp,'good','Лучший вклад в победившей команде'),awardCard('ЛУЧШИЙ В ПОРАЖЕНИИ',bestLoser,'neutral','Сильнейший профиль среди проигравших'),awardCard('САМЫЙ РИСКОВЫЙ ИГРОК',anti,'bad','Наибольшее число негативных сигналов')].join('');
- $("goldGraph").innerHTML=goldAdvantageGraph(m,all);
+ $("goldGraph").innerHTML=goldAdvantageGraph(m,all,culprit);
  $("roleCompare").innerHTML=roleComparison(all,players,m);
- $("shareResult").onclick=()=>{const text=`WHO RUINED? | Match ${m.match_id||$('matchId').value}\nПобедитель: ${winnerTeamForAwards}\nMVP: ${mvp?.personaname||heroName(mvp||{})} (${heroName(mvp||{})})\nЛучший в поражении: ${bestLoser?.personaname||heroName(bestLoser||{})}\nСамый рискованный: ${anti?.personaname||heroName(anti||{})} — ${anti?.score??'—'}\nРазбор: https://china8sd.github.io/who-ruined/`; if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>{$('shareResult').textContent='СКОПИРОВАНО'}).catch(()=>window.prompt('Скопируй результат',text));else window.prompt('Скопируй результат',text);};
+ $("shareResult").onclick=()=>{const text=`WHO RUINED? | Match ${m.match_id||$('matchId').value}\nПобедитель: ${winnerTeamForAwards}\nMVP: ${mvp?.personaname||heroName(mvp||{})} (${heroName(mvp||{})})\nЛучший в поражении: ${bestLoser?.personaname||heroName(bestLoser||{})}\nСамый рискованный: ${anti?.personaname||heroName(anti||{})} — ${anti?.score??'—'}\nРазбор: ${shareUrl(m.match_id||$('matchId').value)}`; if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>{$('shareResult').textContent='СКОПИРОВАНО'}).catch(()=>window.prompt('Скопируй результат',text));else window.prompt('Скопируй результат',text);};
 
  const winningTeam=m.radiant_win?"Radiant":"Dire";
  const winningPlayers=all.filter(p=>p.team===winningTeam).map(p=>({...p,roleInfo:inferRole(p,all.filter(x=>x.team===winningTeam),m.duration||1)}));
  $("winnerTeamName").textContent=`${winningTeam} · ${m.radiant_win?fmt(m.radiant_score):fmt(m.dire_score)} : ${m.radiant_win?fmt(m.dire_score):fmt(m.radiant_score)}`;
  $("winnerTeam").innerHTML=winningPlayers.map(p=>winnerPlayerCard(p)).join("");
  $("players").innerHTML=players.map((p)=>playerCard(p,p===culprit)).join("");
- const events=buildEvents(m,culprit); $("events").innerHTML=events.length?events.map(e=>`<div class="event ${e.danger?'danger':''}"><div class="eventTop"><span class="eventTime">${e.t}</span><span class="eventTag ${e.danger?'bad':''}">${e.danger?'НЕГАТИВНЫЙ СИГНАЛ':'ПОЛОЖИТЕЛЬНЫЙ СИГНАЛ'}</span></div><div class="eventPlayer"><img src="${e.player?.img||''}" alt="" onerror="this.style.visibility='hidden'"><div><strong>${esc(e.player?.name||'Игрок')}</strong><span>${esc(e.player?.hero||'Герой')}</span></div></div><b>${esc(e.title)}</b><div class="eventWhat"><strong>Что произошло:</strong> ${esc(e.text)}</div><div class="eventWhy"><strong>Почему это важно:</strong> ${esc(e.why)}</div></div>`).join(""):`<div class="empty">Для этого матча parsed event data недостаточно.</div>`;
+ const events=buildEvents(m,culprit); $("events").innerHTML=events.length?events.map(e=>`<div class="event ${e.danger?'danger':''}"><div class="eventTop"><span class="eventTime">${e.t}</span><span class="eventTag ${e.danger?'bad':''}">${e.danger?'НЕГАТИВНЫЙ СИГНАЛ':'ПОЛОЖИТЕЛЬНЫЙ СИГНАЛ'}</span></div><div class="eventPlayer"><img src="${esc(e.player?.img||'')}" alt="" onerror="this.style.visibility='hidden'"><div><strong>${esc(e.player?.name||'Игрок')}</strong><span>${esc(e.player?.hero||'Герой')}</span></div></div><b>${esc(e.title)}</b><div class="eventWhat"><strong>Что произошло:</strong> ${esc(e.text)}</div><div class="eventWhy"><strong>Почему это важно:</strong> ${esc(e.why)}</div></div>`).join(""):`<div class="empty">Для этого матча parsed event data недостаточно.</div>`;
  // Старый нижний блок причин удалён: объяснение теперь открывается в модальном окне.
 }
 const whyModal=$("whyRuinerModal");
@@ -194,8 +197,8 @@ document.addEventListener("keydown",e=>{if(e.key==="Escape")whyModal.classList.a
 
 function awardScore(p){return (p.kills||0)*2.2+(p.assists||0)*.9-(p.deaths||0)*1.7+(p.hero_damage||0)/1800+(p.tower_damage||0)/2500+(p.gold_per_min||0)/180+(p.xp_per_min||0)/250;}
 function awardCard(label,p,tone,desc){if(!p)return '';return `<div class="awardCard ${tone}"><div class="awardLabel">${label}</div><div class="awardPlayer"><img src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><b>${esc(p.personaname||`Игрок ${p.idx+1}`)}</b><span>${esc(heroName(p))}</span></div></div><p>${desc}</p><small>K/D/A ${p.kills||0}/${p.deaths||0}/${p.assists||0} · GPM ${fmt(p.gold_per_min)} · Урон ${fmt(p.hero_damage)}</small></div>`;}
-function goldAdvantageGraph(m,all){const rad=all.filter(p=>p.team==='Radiant'),dire=all.filter(p=>p.team==='Dire');const series=[];const maxLen=Math.max(0,...all.map(p=>Array.isArray(p.gold_t)?p.gold_t.length:0));if(maxLen>1){for(let i=0;i<maxLen;i++){const sum=team=>team.reduce((n,p)=>n+(Array.isArray(p.gold_t)?Number(p.gold_t[i]||0):0),0);series.push({r:sum(rad),d:sum(dire)});}}if(series.length<2)return '<div class="empty">OpenDota не вернул временной ряд золота для этого матча. После обновления данных график появится автоматически.</div>';const max=Math.max(1,...series.map(x=>Math.abs(x.r-x.d)));const W=900,H=230,pad=24;const pts=series.map((x,i)=>`${pad+i*(W-2*pad)/(series.length-1)},${H/2-(x.r-x.d)/max*(H/2-pad)}`).join(' ');return `<div class="graphLabels"><span>Radiant впереди</span><span>Dire впереди</span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Преимущество по золоту"><line x1="${pad}" y1="${H/2}" x2="${W-pad}" y2="${H/2}" stroke="#454b58" stroke-dasharray="4 5"/><polyline points="${pts}" fill="none" stroke="#7bb7ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><text x="${pad}" y="${H-5}" fill="#7b8493" font-size="11">0:00</text><text x="${W-pad}" y="${H-5}" fill="#7b8493" font-size="11" text-anchor="end">${time(m.duration)}</text></svg><div class="graphFoot">Максимальная разница по доступным минутным точкам: ${fmt(max)} золота.</div>`;}
-function roleComparison(all,losers,m){const teams={Radiant:all.filter(p=>p.team==='Radiant'),Dire:all.filter(p=>p.team==='Dire')};return all.map(p=>{const roleInfo=inferRole(p,teams[p.team]||[],m.duration||1);const role=roleInfo.role;const exp={"Pos 1 · Carry":[520,550],"Pos 2 · Mid":[480,530],"Pos 3 · Offlane":[420,470],"Pos 4 · Soft Support":[330,390],"Pos 5 · Hard Support":[270,340]}[role]||[400,450];const g=Math.round((p.gold_per_min||0)/exp[0]*100),x=Math.round((p.xp_per_min||0)/exp[1]*100);const isLoss=losers.some(q=>q.player_slot===p.player_slot);return `<div class="roleRow"><img src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div class="rolePlayer"><b>${esc(p.personaname||`Игрок ${p.idx+1}`)}</b><span>${esc(heroName(p))}</span></div><div class="roleMetric"><span>GPM / ориентир</span><div><i style="width:${clamp(g,0,150)/1.5}%"></i></div><b>${fmt(p.gold_per_min)} <small>${g}%</small></b></div><div class="roleMetric"><span>XPM / ориентир</span><div><i style="width:${clamp(x,0,150)/1.5}%"></i></div><b>${fmt(p.xp_per_min)} <small>${x}%</small></b></div><em class="teamTag ${isLoss?'lost':'won'}">${isLoss?'ПОРАЖЕНИЕ':'ПОБЕДА'}</em></div>`;}).join('');}
+function goldAdvantageGraph(m,all,culprit){const rad=all.filter(p=>p.team==='Radiant'),dire=all.filter(p=>p.team==='Dire');const series=[];const maxLen=Math.max(0,...all.map(p=>Array.isArray(p.gold_t)?p.gold_t.length:0));if(maxLen>1){for(let i=0;i<maxLen;i++){const sum=team=>team.reduce((n,p)=>n+(Array.isArray(p.gold_t)?Number(p.gold_t[i]||0):0),0);series.push({r:sum(rad),d:sum(dire)});}}if(series.length<2)return '<div class="empty">OpenDota не вернул временной ряд золота для этого матча. После обновления данных график появится автоматически.</div>';const max=Math.max(1,...series.map(x=>Math.abs(x.r-x.d)));const W=900,H=230,pad=24;const marks=deathMarks(m,all,culprit,series.length,W,H,pad,max,series);const pts=series.map((x,i)=>`${pad+i*(W-2*pad)/(series.length-1)},${H/2-(x.r-x.d)/max*(H/2-pad)}`).join(' ');return `<div class="graphLabels"><span>Radiant впереди</span><span>Dire впереди</span></div><svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Преимущество по золоту"><line x1="${pad}" y1="${H/2}" x2="${W-pad}" y2="${H/2}" stroke="#454b58" stroke-dasharray="4 5"/><polyline points="${pts}" fill="none" stroke="#7bb7ff" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/><text x="${pad}" y="${H-5}" fill="#7b8493" font-size="11">0:00</text><text x="${W-pad}" y="${H-5}" fill="#7b8493" font-size="11" text-anchor="end">${time(m.duration)}</text>${marks}</svg><div class="graphFoot">Максимальная разница по доступным минутным точкам: ${fmt(max)} золота.</div>`;}
+function roleComparison(all,losers,m){const teams={Radiant:all.filter(p=>p.team==='Radiant'),Dire:all.filter(p=>p.team==='Dire')};return all.map(p=>{const roleInfo=inferRole(p,teams[p.team]||[],m.duration||1);const role=roleInfo.role;const exp={"Pos 1 · Carry":[520,550],"Pos 2 · Mid":[480,530],"Pos 3 · Offlane":[420,470],"Pos 4 · Soft Support":[330,390],"Pos 5 · Hard Support":[270,340]}[role]||[400,450];const g=Math.round((p.gold_per_min||0)/(exp[0]*CAL)*100),x=Math.round((p.xp_per_min||0)/(exp[1]*CAL)*100);const isLoss=losers.some(q=>q.player_slot===p.player_slot);return `<div class="roleRow"><img src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div class="rolePlayer"><b>${esc(p.personaname||`Игрок ${p.idx+1}`)}</b><span>${esc(heroName(p))}</span></div><div class="roleMetric"><span>GPM / ориентир</span><div><i style="width:${clamp(g,0,150)/1.5}%"></i></div><b>${fmt(p.gold_per_min)} <small>${g}%</small></b></div><div class="roleMetric"><span>XPM / ориентир</span><div><i style="width:${clamp(x,0,150)/1.5}%"></i></div><b>${fmt(p.xp_per_min)} <small>${x}%</small></b></div><em class="teamTag ${isLoss?'lost':'won'}">${isLoss?'ПОРАЖЕНИЕ':'ПОБЕДА'}</em></div>`;}).join('');}
 function metricLine(label,value,detail){return `<div class="vmetric"><span>${esc(label)}</span><b>${esc(value)}</b><small>${esc(detail)}</small></div>`;}
 function impactLabel(score){ if(score>=75)return "Очень высокое"; if(score>=55)return "Высокое"; if(score>=35)return "Умеренное"; if(score>=20)return "Небольшое"; return "Низкое"; }
 function impactClass(score){ if(score>=75)return "very-high"; if(score>=55)return "high"; if(score>=35)return "moderate"; if(score>=20)return "low"; return "minimal"; }
@@ -284,7 +287,7 @@ function winnerPlayerCard(p){
 function playerCard(p,isCulprit){
  const kd=`${p.kills||0}/${p.deaths||0}/${p.assists||0}`, items=itemsOf(p);
  return `<div class="playerCard ${isCulprit?'culprit':''}">
-  <div class="playerHead"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><div class="pname">${esc(p.personaname||'Unknown')}</div><div class="heroName">${esc(heroName(p))}</div></div><div class="pScore">${p.score}</div></div>
+  <div class="playerHead"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><div class="pname">${esc(p.personaname||'Unknown')}${p.leaver?' <span class="leaverTag">ЛИВЕР/АФК</span>':''}</div><div class="heroName">${esc(heroName(p))}</div></div><div class="pScore">${p.score}</div></div>
   <div class="statgrid"><span>K/D/A <b>${kd}</b></span><span>GPM <b>${fmt(p.gold_per_min)}</b></span><span>XPM <b>${fmt(p.xp_per_min)}</b></span><span>Last Hits <b>${fmt(p.last_hits)}</b></span><span>Hero DMG <b>${fmt(p.hero_damage)}</b></span><span>DMG Share <b>${p.dmgShare.toFixed(1)}%</b></span><span>KP <b>${p.kp.toFixed(0)}%</b></span><span>Tower DMG <b>${fmt(p.tower_damage)}</b></span><span>Net Worth <b>${fmt(p.net_worth)}</b></span><span>Healing <b>${fmt(p.hero_healing)}</b></span><span>Wards <b>${fmt((p.obs_placed||0)+(p.sentry_placed||0))}</b></span><span>Denies <b>${fmt(p.denies)}</b></span></div>
   <div class="build"><span>Сборка</span>${items.length?items.map(id=>`<img title="${esc(itemName(id))}" src="${itemImg(id)}" onerror="this.style.visibility='hidden'">`).join(''):'<em>нет данных</em>'}</div>
  </div>`;
