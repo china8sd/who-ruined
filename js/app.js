@@ -16,7 +16,7 @@ async function run(id){
   if(!mr.ok)throw httpErr(mr.status);
   const m=await mr.json(); HEROES=h; ITEMS=i;
   await analyze(m); setStatus(`Матч ${id} обработан`);
- }catch(err){track("error/"+(err instanceof TypeError?"network":String(err.message).slice(0,20)));setStatus(err instanceof TypeError?t("Нет соединения с OpenDota. Проверь интернет."):err.message,"err")}
+ }catch(err){track("error/"+(err instanceof TypeError?"network":(err.code||"other")));setStatus(err instanceof TypeError?t("Нет соединения с OpenDota. Проверь интернет."):err.message,"err")}
 }
 $("form").addEventListener("submit",e=>{e.preventDefault();run($("matchId").value)});
 

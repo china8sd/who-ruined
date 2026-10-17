@@ -101,3 +101,105 @@ h1 span{filter:none;text-shadow:none}
 .verdictHero img{filter:none}
 .bg{transform:translateZ(0);contain:strict}
 #result>*{animation-duration:.35s}
+
+/* ===== v4.3 title banner + BetBoom promo button ===== */
+h1.titleBanner{margin:0 0 6px;letter-spacing:0;background:none;color:inherit;line-height:0}
+h1.titleBanner img{display:block;width:min(100%,560px);height:auto;border-radius:14px;box-shadow:0 14px 44px rgba(0,0,0,.5),0 0 0 1px rgba(255,255,255,.08)}
+.ctaRow{display:flex;flex-wrap:wrap;align-items:center;gap:18px 22px;margin-top:14px}
+.tgBlock{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.promoBlock{display:flex;flex-direction:column;align-items:flex-start;gap:5px}
+.betboomBtn{position:relative;display:block;width:min(100%,300px);padding:12px 18px;border-radius:14px;overflow:hidden;text-decoration:none;
+ background:linear-gradient(180deg,#f3f4f6 0%,#d9dce0 46%,#bcc0c6 50%,#d3d7db 78%,#e6e8eb 100%);
+ border:1px solid #8c9199;box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 rgba(0,0,0,.14),0 8px 22px rgba(0,0,0,.45);
+ transition:transform .15s,box-shadow .2s,filter .2s}
+.betboomBtn img{position:relative;z-index:1;display:block;width:100%;height:auto}
+.betboomBtn:before{content:"";position:absolute;top:0;bottom:0;left:-60%;width:40%;z-index:2;pointer-events:none;
+ background:linear-gradient(100deg,transparent,rgba(255,255,255,.75),transparent);transform:skewX(-18deg);transition:left .6s ease}
+.betboomBtn:hover{transform:translateY(-2px);filter:brightness(1.04);box-shadow:inset 0 1px 0 #fff,inset 0 -2px 0 rgba(0,0,0,.14),0 14px 30px rgba(0,0,0,.55)}
+.betboomBtn:hover:before{left:130%}.betboomBtn:active{transform:none}
+.adLabel{font-size:10px;letter-spacing:.6px;color:#667082;text-transform:uppercase}
+@media(max-width:600px){.betboomBtn{width:100%}.ctaRow{gap:14px}}
+
+/* ===== v4.4 dark / white-ink style for banner and BetBoom button ===== */
+h1.titleBanner img{box-shadow:0 14px 44px rgba(0,0,0,.55),0 0 0 1px rgba(255,255,255,.14)}
+.betboomBtn{background:linear-gradient(180deg,#3a3f41 0%,#2a2e30 47%,#1d2022 51%,#262a2c 80%,#2f3436 100%);
+ border:1px solid #4d5356;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.35),0 8px 22px rgba(0,0,0,.5)}
+.betboomBtn:before{background:linear-gradient(100deg,transparent,rgba(255,255,255,.28),transparent)}
+.betboomBtn:hover{filter:brightness(1.12);border-color:#6a7174;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),inset 0 -2px 0 rgba(0,0,0,.35),0 14px 30px rgba(0,0,0,.6)}
+
+/* ===== v4.5 lettering logo, BetBoom mark, one-line CTA row ===== */
+.brandMark{width:56px;height:56px;padding:9px;margin:0 0 12px;display:flex;align-items:center;justify-content:center;border-radius:13px;
+ background:linear-gradient(180deg,#2c302f,#1d2120);border:1px solid rgba(255,255,255,.18);box-shadow:inset 0 1px 0 rgba(255,255,255,.14),0 8px 20px rgba(0,0,0,.45)}
+.brandMark img{display:block;max-width:100%;max-height:100%;width:auto;height:auto}
+h1.titleBanner{margin:0 0 6px}
+h1.titleBanner img{width:min(100%,560px);height:auto;border-radius:0;box-shadow:none;background:none}
+.ctaRow{flex-wrap:nowrap;align-items:center;gap:16px}
+.tgBlock{flex-direction:column;align-items:flex-start;gap:6px;flex:0 0 auto}
+.promoBlock{flex:0 0 auto}
+.betboomBtn{width:230px;max-width:100%;padding:9px 13px;border-radius:12px}
+@media(max-width:520px){.ctaRow{flex-wrap:wrap}.betboomBtn{width:min(100%,260px)}}
+
+/* ===== v4.6 BetBoom logo above title, equal-size CTA buttons ===== */
+.titleBlock{display:flex;flex-direction:column;align-items:center;width:min(100%,560px);margin:0 0 4px}
+.bbLogo{display:block;width:250px;max-width:70%;height:auto;border-radius:11px;margin-bottom:-2px;box-shadow:0 8px 22px rgba(0,0,0,.45)}
+.titleBlock h1.titleBanner{width:100%;margin:0}
+.ctaRow{flex-wrap:nowrap;align-items:flex-start;gap:14px}
+.tgBlock,.promoBlock{flex:1 1 0;min-width:0;max-width:210px;display:flex;flex-direction:column;align-items:stretch;gap:6px}
+.telegram,.betboomBtn{width:100%;height:76px;box-sizing:border-box}
+.telegram{display:flex;align-items:center;justify-content:center;gap:9px;font-size:14px;white-space:nowrap}
+.betboomBtn{display:flex;align-items:center;justify-content:center;padding:7px 10px;border-radius:12px}
+.betboomBtn img{width:100%;height:100%;object-fit:contain}
+@media(max-width:520px){.ctaRow{flex-wrap:nowrap}.betboomBtn{width:100%}.telegram{font-size:12px;gap:6px}}
+
+/* ===== v4.7 smaller logo + smaller aligned grey buttons ===== */
+.bbLogo{width:120px;max-width:50%;border-radius:9px;margin-bottom:4px;box-shadow:0 6px 16px rgba(0,0,0,.45)}
+h1.titleBanner img{width:min(100%,532px)}
+.ctaRow{align-items:flex-start;gap:12px;margin-top:14px}
+.tgBlock,.promoBlock{max-width:180px;gap:6px}
+.telegram,.betboomBtn{height:64px;margin:0}
+.authorCaption,.adLabel{margin:0;line-height:1.2}
+.telegram{font-size:13px;gap:8px;color:#fff;
+ background:linear-gradient(180deg,#4b5053 0%,#3b4043 48%,#2f3335 52%,#383d3f 100%);
+ border:1px solid #646a6e;box-shadow:inset 0 1px 0 rgba(255,255,255,.22),inset 0 -2px 0 rgba(0,0,0,.3),0 8px 20px rgba(0,0,0,.45);
+ transition:transform .15s,filter .2s}
+.telegram:hover{filter:brightness(1.12);transform:translateY(-2px)}
+.betboomBtn{padding:6px 9px}
+@media(max-width:520px){.telegram{font-size:12px}.bbLogo{width:104px}}
+
+/* ===== v4.8 framed title with BetBoom logo inside ===== */
+.titleBlock{width:min(100%,600px);align-items:flex-start}
+h1.titleBanner img{width:min(100%,600px);height:auto}
+
+/* ===== v4.9 frameless title, big transparent logo, yellow promo banner, mini Telegram in top bar ===== */
+.titleBlock{width:min(100%,532px);align-items:center}
+.bbLogo{display:block;width:240px;max-width:72%;height:auto;margin:0 0 -4px;border-radius:0;box-shadow:none;background:none}
+h1.titleBanner img{width:min(100%,532px)}
+.ctaRow{margin-top:16px}
+.promoBlock{flex:0 0 auto;max-width:340px;width:100%;gap:6px}
+.betboomBtn{display:block;width:100%;height:auto;padding:0;background:none;border:0;border-radius:12px;overflow:hidden;box-shadow:0 10px 28px rgba(0,0,0,.5);transition:transform .15s,box-shadow .2s,filter .2s}
+.betboomBtn:before{display:none}
+.betboomBtn img{display:block;width:100%;height:auto;object-fit:initial}
+.betboomBtn:hover{transform:translateY(-2px);filter:brightness(1.05);box-shadow:0 16px 36px rgba(0,0,0,.6)}
+.topBar{position:absolute;top:18px;right:22px;display:flex;align-items:center;gap:8px;z-index:5}
+.topBar .langBtn{position:static}
+.topBar .telegram{width:auto;height:auto;margin:0;padding:7px 11px;font-size:11px;font-weight:800;gap:6px;border-radius:8px;white-space:nowrap}
+.topBar .telegramIcon{font-size:11px}
+@media(max-width:600px){.topBar{top:12px;right:14px}.promoBlock{max-width:100%}}
+
+/* ===== v4.10 logo a bit higher, promo banner a bit smaller ===== */
+.bbLogo{margin-top:-10px;margin-bottom:12px}
+.promoBlock{max-width:290px}
+@media(max-width:600px){.promoBlock{max-width:260px}}
+
+/* ===== v4.11 small inline Telegram button under the lead text ===== */
+.leadCta{margin:-4px 0 16px}
+.telegram.tgInline{display:inline-flex;align-items:center;width:auto;height:auto;margin:0;padding:6px 12px;font-size:12px;font-weight:800;gap:7px;border-radius:8px;white-space:nowrap}
+.telegram.tgInline .telegramIcon{font-size:11px}
+
+/* ===== v4.14 Telegram + bonus button under the input, equal size ===== */
+.ctaRow{display:flex;flex-wrap:nowrap;align-items:flex-start;gap:10px;margin-top:12px}
+.ctaRow>.telegram.tgInline,.promoBlock{flex:0 1 171px;min-width:0;width:171px;max-width:171px}
+.telegram.tgInline{height:38px;justify-content:center;padding:0 10px;font-size:12px}
+.promoBlock{display:flex;flex-direction:column;gap:5px}
+.betboomBtn{width:100%;height:38px;border-radius:8px;box-shadow:0 8px 20px rgba(0,0,0,.45)}
+.betboomBtn img{display:block;width:100%;height:100%;object-fit:contain}
