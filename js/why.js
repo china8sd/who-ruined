@@ -106,7 +106,7 @@ function sectionBuild(C){
   const row=E[p.team].rows.find(x=>x.I.p.player_slot===p.player_slot);
   if(!row||row.r.na)return'';
   const r=row.r;
-  return`<div class="wySec"><h3>Билд</h3><p class="wyHint">Оценка билда: <b>${r.score}/10</b>.${r.cons.length?' Что в нём не так:':' Серьёзных претензий к билду нет.'}</p>${r.cons.length?`<ul class="wyList">${r.cons.slice(0,4).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}${r.need.length?`<p class="wyHint">Чего не хватило: <b>${esc(r.need.join(' · '))}</b></p>`:''}<p class="wyHint">Полный разбор — в кнопке «Оценка билдов».</p></div>`;
+  return`<div class="wySec"><h3>Билд</h3><p class="wyHint">Оценка билда: <b>${r.score}/10</b>.${r.cons.length?' Что в нём не так:':' Серьёзных претензий к билду нет.'}</p>${r.cons.length?`<ul class="wyList">${r.cons.slice(0,4).map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}${r.need.map(n=>`<p class="wyHint">Чего не хватило: <b>${esc(n.i)}</b>${n.w?` — ${esc(n.w)}`:''}</p>`).join('')}<p class="wyHint">Полный разбор — в кнопке «Оценка билдов».</p></div>`;
  }catch(e){return''}
 }
 

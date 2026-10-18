@@ -12,6 +12,11 @@ const PHYS_HI=S(['sven','juggernaut','phantom_assassin','luna','drow_ranger','fa
 const SUMMON=S(['naga_siren','terrorblade','phantom_lancer','chaos_knight','arc_warden','lycan','broodmother','visage','beastmaster','enigma','furion','shadow_shaman','undying','warlock','spectre','meepo','lone_druid','dark_seer','invoker','morphling']);
 const INVIS_H=S(['riki','clinkz','bounty_hunter','weaver','nyx_assassin','mirana','invoker','treant','broodmother','sand_king']);
 const EVADE_H=S(['phantom_assassin','windrunner','brewmaster']);
+const NO_BKB=S(['phantom_lancer','spectre','life_stealer','naga_siren']); /* иллюзионисты и Lifestealer: BKB не советуем */
+const NO_MKB=S(['spectre','drow_ranger','phantom_lancer']); /* MKB не советуем */
+const BT_HERO=S(['phantom_lancer']); /* вместо MKB — Bloodthorn */
+const SPELL_CARRIES=S(['storm_spirit','invoker','tinker','leshrac','lina','zuus','skywrath_mage','queenofpain','void_spirit','puck','death_prophet','necrolyte','shadow_fiend','nevermore','pugna','ancient_apparition','techies','earth_spirit','tiny','kunkka','ogre_magi','lion','crystal_maiden','witch_doctor','warlock','dark_willow','muerta','hoodwink','snapfire']);
+const CONTROL_ITEMS=['basher','abyssal_blade','sheepstick','orchid','bloodthorn','rod_of_atos','gungir','heavens_halberd'];
 const INVIS_I=['invis_sword','silver_edge'], EVADE_I=['butterfly','radiance'];
 
 const BOOTS=S(['boots','phase_boots','power_treads','arcane_boots','tranquil_boots','travel_boots','travel_boots_2','boots_of_bearing','guardian_greaves']);
@@ -24,7 +29,6 @@ const PHYS_DEF=['crimson_guard','shivas_guard','assault','heavens_halberd'];
 const ILLU_DEF=['crimson_guard','shivas_guard','assault','mjollnir','maelstrom','gungir','radiance'];
 const DETECT=['dust','gem','ward_sentry','ward_dispenser'];
 const MKB=['monkey_king_bar','bloodthorn'];
-const BLINK=['blink','swift_blink','arcane_blink','overwhelming_blink'];
 const UTILITY=['mekansm','guardian_greaves','glimmer_cape','force_staff','hurricane_pike','ghost','rod_of_atos','spirit_vessel','solar_crest','medallion_of_courage','lotus_orb','pavise','holy_locket','ancient_janggo','veil_of_discord','pipe','cyclone','wind_waker','aether_lens','octarine_core','sheepstick','orchid','bloodthorn','nullifier','blink','swift_blink','arcane_blink','overwhelming_blink','black_king_bar','shivas_guard','crimson_guard','refresher','aeon_disk','sphere'];
 const CORE_ONLY=S(['bfury','radiance','maelstrom','mjollnir','desolator','greater_crit','butterfly','skadi','satanic','abyssal_blade','monkey_king_bar','moon_shard','rapier','basher','sange_and_yasha','kaya_and_sange','yasha_and_kaya','manta','diffusal_blade','disperser','heart','assault','gungir','armlet']);
 const SUP_ONLY=S(['mekansm','glimmer_cape','ward_dispenser','tranquil_boots','boots_of_bearing','holy_locket','medallion_of_courage','urn_of_shadows','solar_crest','ancient_janggo','pavise','aether_lens','arcane_boots','spirit_vessel']);
@@ -73,8 +77,9 @@ function pickCandidate(members,tbl,exclude){
  members.forEach(I=>{
   if(I.leaver||(exclude&&exclude.includes(I.p.player_slot)))return;
   const r=I.p&&heroData(I.p).roles||[];
-  let s=tbl[I.pos]??.3;if(r.includes('Durable'))s+=.15;if(r.includes('Initiator'))s+=.1;
+  let s=tbl[I.pos]??0;if(r.includes('Durable'))s+=.15;if(r.includes('Initiator'))s+=.1;
   if((I.p.net_worth||0)<4500)s*=.6;
+   if(s<.2)return;
   if(s>bs){bs=s;best=I}
  });
  return best;
@@ -84,8 +89,9 @@ function pickCandidate(members,tbl,exclude){
 function rateOne(I,TC,G){
  const p=I.p,pos=I.pos,inv=I.inv,pf=TC.prof,min=G.min,D=G.D;
  const pros=[],cons=[],need=[];let s=0;
+ const N=(i,w)=>need.push({i,w:w||''});
  const P=(d,t)=>{s+=d;pros.push(t)}, C=(d,t)=>{s+=d;cons.push(t)};
- const core=pos<=3, sup=pos>=4, roles=heroData(p).roles||[];
+ const core=pos<=3, sup=pos>=4, roles=heroData(p).roles||[], hname=strip(heroData(p).name);
  const has=k=>inv.all.has(k);
  if(!inv.main.length&&!inv.bp.length)return{na:true,why:'Нет данных о предметах'};
  if(I.leaver)return{na:true,why:'Ливер/АФК — билд не оценивается'};
@@ -111,13 +117,15 @@ function rateOne(I,TC,G){
  /* 2. ботинки */
  const boots=inv.main.concat(inv.bp).find(k=>BOOTS.has(k));
  if(min>=15&&!boots)C(-.8,'Нет ботинок');
- else if(boots&&BASE_BOOTS.has(boots)&&min>=25)C(-.5,'Ботинки не улучшены к ' +min+'-й минуте'),need.push('Улучшение ботинок');
+ else if(boots&&BASE_BOOTS.has(boots)&&min>=25)C(-.5,'Ботинки не улучшены к ' +min+'-й минуте'),N('Улучшение ботинок','Базовые сапоги на такой минуте — потерянная скорость и характеристики.');
  else if(boots&&sup&&UTIL_BOOTS.has(boots))P(.3,`Полезные для саппорта ботинки (${nm(boots)})`);
  else if(boots&&core&&['phase_boots','power_treads','travel_boots','travel_boots_2'].includes(boots)&&min>=20)P(.2,`Подходящие ботинки (${nm(boots)})`);
 
  /* 3. выживаемость против контроля (BKB и альтернативы) */
- if((core&&min>=24)||(pos===4&&min>=30)){
-  const sc=pos===4?.5:1,need0=pf.needBKB,late=cl((min-20)/12,.4,1);
+ if(core&&min>=24&&NO_BKB.has(hname)){
+  if(anyOf(inv,BKB))P(.2,'BKB есть — не обязателен герою, но не лишний');
+ }else if(core&&min>=24){
+  const sc=1,need0=pf.needBKB,late=cl((min-20)/12,.4,1);
   if(anyOf(inv,BKB)){
    const t=boughtAt(p,'black_king_bar');
    P((.6+.7*need0)*sc,pf.ctl>=3?`Есть BKB — против контроля врага (≈${Math.round(pf.ctl)} героя с дизейблами)`:'Есть BKB — страховка от контроля врага');
@@ -126,7 +134,7 @@ function rateOne(I,TC,G){
   }else if(anyOf(inv,ALT_SAVE)){
    P(.2*sc,`Нет BKB, но есть защита: ${names(ALT_SAVE,inv)}`);C(-.25*need0*sc,'Без BKB против контроля всё равно уязвим');
   }else{
-   C(-(.5+1.1*need0)*late*sc,`Нет BKB и альтернативы против ${Math.round(pf.ctl)||'нескольких'} героев с контролем`);need.push('Black King Bar');
+   C(-(.5+1.1*need0)*late*sc,`Нет BKB и альтернативы против ${Math.round(pf.ctl)||'нескольких'} героев с контролем`);N('Black King Bar',`Против ≈${Math.round(pf.ctl)||'нескольких'} героев с дизейблами без BKB кор выпадает из драки первым.`);
   }
  }
 
@@ -135,13 +143,13 @@ function rateOne(I,TC,G){
  if(TC.pipe&&min>=20){
   if(TC.pipe.slot===mySlot){
    if(TC.pipe.have)P(.5+.5*TC.pipe.str,`${names(MAG_DEF,inv)} — верное решение против ${Math.round(pf.mag*100)}% магического урона врага`);
-   else{C(-(.4+.6*TC.pipe.str),`Враг бьёт магией (${Math.round(pf.mag*100)}%), а у команды нет Pipe/Hood — по роли ему было выгоднее всех купить`);need.push('Pipe of Insight / Hood of Defiance');}
+   else{C(-(.4+.6*TC.pipe.str),`Враг бьёт магией (${Math.round(pf.mag*100)}%), а у команды нет Pipe/Hood — по роли ему было выгоднее всех купить`);N('Pipe of Insight / Hood of Defiance',`Враг бьёт магией (${Math.round(pf.mag*100)}%): аура-барьер и сопротивление на всю команду режут урон от спеллов.`);}
   }else if(TC.pipe.have&&anyOf(inv,MAG_DEF))P(.4,`${names(MAG_DEF,inv)} против ${Math.round(pf.mag*100)}% магического урона`);
  }
  if(TC.crim&&min>=20){
   if(TC.crim.slot===mySlot){
    if(TC.crim.have)P(.5+.5*TC.crim.str,`${names(TC.crim.list,inv)} — к месту против ${TC.crim.why}`);
-   else{C(-(.4+.6*TC.crim.str),`Против ${TC.crim.why} у команды нет Crimson Guard / Shiva's — ему было выгоднее всех`);need.push("Crimson Guard / Shiva's Guard");}
+   else{C(-(.4+.6*TC.crim.str),`Против ${TC.crim.why} у команды нет Crimson Guard / Shiva's — ему было выгоднее всех`);N("Crimson Guard / Shiva's Guard",`Против ${TC.crim.why}: броня и блок/замедление на всю команду.`);}
   }else if(TC.crim.have&&anyOf(inv,TC.crim.list))P(.3,`${names(TC.crim.list,inv)} против ${TC.crim.why}`);
  }
 
@@ -149,13 +157,23 @@ function rateOne(I,TC,G){
  if(TC.det&&min>=18){
   const isCand=TC.det.slots.includes(mySlot);
   if(TC.det.have){if(touched(p,inv,'dust')||touched(p,inv,'gem')||touched(p,inv,'ward_sentry')||touched(p,inv,'ward_dispenser')||(p.sentry_placed||0)>0)P(.4,`Взял детекцию против невидимых (${pf.invis.slice(0,2).join(', ')})`)}
-  else if(isCand){C(mySlot===TC.det.slots[0]?-.7:-.4,`У врага невидимки (${pf.invis.slice(0,2).join(', ')}), а у команды нет ни сентри, ни даста, ни gem`);need.push('Sentry / Dust / Gem')}
+  else if(isCand){C(mySlot===TC.det.slots[0]?-.7:-.4,`У врага невидимки (${pf.invis.slice(0,2).join(', ')}), а у команды нет ни сентри, ни даста, ни gem`);N('Sentry / Dust / Gem','Без детекции невидимок не поймать, они выбирают момент драки.')}
  }
 
- /* 6. уклонение врага → MKB/Bloodthorn */
- if(pf.evade.length&&pos<=2&&min>=25&&roles.includes('Carry')){
-  if(anyOf(inv,MKB))P(.5,`${names(MKB,inv)} против уклонения (${pf.evade.slice(0,2).join(', ')})`);
-  else{C(-.5,`Враг играет через уклонение (${pf.evade.slice(0,2).join(', ')}), а у кэрри нет MKB/Bloodthorn`);need.push('Monkey King Bar / Bloodthorn')}
+ /* 6. уклонение врага → MKB/Bloodthorn (только для героев, которые бьют руками) */
+ const attackHero=roles.includes('Carry')&&!SPELL_CARRIES.has(hname)&&heroData(p).primary_attr!=='int';
+ const plBT=BT_HERO.has(hname);
+ if(pf.evade.length&&pos<=2&&min>=25&&attackHero&&(!NO_MKB.has(hname)||plBT)){
+  const list=plBT?['bloodthorn']:MKB;
+  if(anyOf(inv,list))P(.5,`${names(list,inv)} против уклонения (${pf.evade.slice(0,2).join(', ')})`);
+  else{C(-.5,`Враг играет через уклонение (${pf.evade.slice(0,2).join(', ')}), а ${plBT?'в билде нет Bloodthorn':'у кэрри нет MKB/Bloodthorn'}`);
+   N(plBT?'Bloodthorn':'Monkey King Bar / Bloodthorn',plBT?'Bloodthorn даёт true strike, крит и сайленс — пробивает уклонение и не конфликтует с иллюзиями.':'True strike пробивает уклонение и Butterfly/Radiance, иначе половина ударов в молоко.')}
+ }
+
+ /* 6b. кэрри-милишнику без собственного контроля — Basher */
+ if(core&&pos<=2&&min>=22&&heroData(p).attack_type==='Melee'&&attackHero&&!roles.includes('Disabler')){
+  if(!anyOf(inv,CONTROL_ITEMS)){C(-.3,'У героя нет своего контроля, и в билде ни одного предмета с контролем');N('Skull Basher (→ Abyssal Blade)','Без своих оглушений Basher даёт проки стана на атаках — кэрри сам фиксирует цель; Abyssal позже закрепит.')}
+  else P(.2,`Контроль через предметы: ${names(CONTROL_ITEMS,inv)}`);
  }
 
  /* 7. соответствие роли */
@@ -170,21 +188,21 @@ function rateOne(I,TC,G){
  }
  if(sup&&min>=22){
   const u=inv.main.concat(inv.bp).filter(k=>UTILITY.includes(k));
-  if(u.length)P(Math.min(.8,.35+.2*u.length),`Командная/спасающая польза: ${[...new Set(u)].slice(0,3).map(nm).join(', ')}`);
-  else if(min>=28){C(-.6,'Нет ни одного спасающего или командного предмета');need.push('Force Staff / Glimmer Cape / Mekansm')}
- }
-
- /* 8. инициация / мобильность */
- const needBlink=pos===3||(pos===4&&roles.includes('Initiator'));
- if(needBlink&&min>=26){
-  if(anyOf(inv,BLINK))P(.5,`Блинк для входа в драку (${names(BLINK,inv)})`);
-  else if(!anyOf(inv,['force_staff','hurricane_pike','cyclone','wind_waker','ghost'])){C(pos===3?-.5:-.3,'Нет блинка/мобильности для инициации');need.push('Blink Dagger')}
+  const mg=Math.round(pf.mag*100),ph=100-mg,hasG=has('glimmer_cape'),hasS=has('solar_crest');
+  if(hasG&&pf.mag>=.5)P(.5,`Glimmer Cape: против ${mg}% магического урона даёт союзнику магрезист и невидимость — спасает кора от бурста`);
+  else if(hasS&&pf.phys>=.5)P(.5,`Solar Crest: против ${ph}% физического урона режет броню врага и даёт броню союзнику — это усиливает кора`);
+  else if(u.length)P(Math.min(.8,.35+.2*u.length),`Командная/спасающая польза: ${[...new Set(u)].slice(0,3).map(nm).join(', ')}`);
+  if(!hasG&&!hasS&&min>=24&&(pf.mag>=.55||pf.phys>=.55)){ /* советуем только при явном перекосе урона */
+   const heavy=!u.length;
+   if(pf.mag>=pf.phys){C(heavy?-.6:-.2,`Враг бьёт магией (${mg}%), а Glimmer Cape в билде нет`);N('Glimmer Cape',`Против ${mg}% магического урона Glimmer даёт кору и тебе магрезист плюс невидимость при фокусе — дешёвый способ пережить бурст.`)}
+   else{C(heavy?-.6:-.2,`Враг бьёт физикой (${ph}%), а Solar Crest в билде нет`);N('Solar Crest',`Против ${ph}% физического урона Solar Crest нужен ради кора: союзнику броня и уклонение, у врага минус брони — кор живёт дольше и убивает быстрее.`)}
+  }
  }
 
  /* итог */
  const scale=min<15?.5:min<22?.8:1;
  const raw=6+s*scale,score=cl(Math.round(raw),1,10);
- return{na:false,score,raw,pros,cons,need:[...new Set(need)].slice(0,3)};
+ return{na:false,score,raw,pros,cons,need:need.filter((x,i,a)=>a.findIndex(y=>y.i===x.i)===i).slice(0,3)};
 }
 
 /* ---------- сбор данных по матчу ---------- */
@@ -213,13 +231,13 @@ function evaluate(C){
   const doPipe=()=>{
    if(mStr<.25)return;
    if(pipeHas){const h=holder(MAG_DEF);TC.pipe={slot:h.p.player_slot,have:true,str:mStr};recs.push({k:'ok',t:`<b>${esc(hn(h.p))}</b> собрал ${esc(names(MAG_DEF,h.inv))} — против ${Math.round(prof.mag*100)}% магического урона врага это правильно.`})}
-   else{const c=pickCandidate(me,{3:1,4:.9,5:.6,2:.3,1:.15},used);if(c){used.push(c.p.player_slot);TC.pipe={slot:c.p.player_slot,have:false,str:mStr};
+   else{const c=pickCandidate(me,{3:1,4:.25},used);if(c){used.push(c.p.player_slot);TC.pipe={slot:c.p.player_slot,have:false,str:mStr};
     recs.push({k:'warn',t:`Враг бьёт в основном магией (<b>${Math.round(prof.mag*100)}%</b>), а Pipe/Hood/Eternal Shroud в команде нет. Выгоднее всех его было купить <b>${esc(hn(c.p))}</b> (${esc(c.p.personaname||'игрок')}): ${c.pos>=4?'аура на всю команду работает там, где он стоит рядом с союзниками':'он в центре драки, и аура накрывает всех'}.`})}}
   };
   const doCrim=()=>{
    if(cStr<.25)return;
    if(crimHas){const h=holder(crimList);TC.crim={slot:h.p.player_slot,have:true,str:cStr,why:crimWhy,list:crimList};recs.push({k:'ok',t:`<b>${esc(hn(h.p))}</b> собрал ${esc(names(crimList,h.inv))} — это к месту против ${esc(crimWhy)}.`})}
-   else{const c=pickCandidate(me,{3:1,4:.6,2:.4,1:.3,5:.25},used);if(c){used.push(c.p.player_slot);TC.crim={slot:c.p.player_slot,have:false,str:cStr,why:crimWhy,list:crimList};
+   else{const c=pickCandidate(me,{3:1,4:.25},used);if(c){used.push(c.p.player_slot);TC.crim={slot:c.p.player_slot,have:false,str:cStr,why:crimWhy,list:crimList};
     recs.push({k:'warn',t:`Против ${esc(crimWhy)} в команде нет Crimson Guard / Shiva's Guard. Выгоднее всех его было купить <b>${esc(hn(c.p))}</b> (${esc(c.p.personaname||'игрок')}).`})}}
   };
   if(pipeFirst){doPipe();doCrim()}else{doCrim();doPipe()}
@@ -248,7 +266,7 @@ function card(x){
  const head=`<div class="bvHero"><img src="${esc(heroImg(p))}" alt="" onerror="this.style.visibility='hidden'"><div style="min-width:0"><b>${esc(hn(p))}</b><span>${esc(p.personaname||('Игрок '+(p.idx+1)))}</span></div></div>`;
  if(r.na)return`<div class="bvItem">${head}<div class="bvMain">${buildRow(p,true)}<div class="bvVerdict">${esc(r.why)}</div></div><div class="bvScore s-na"><strong>—</strong><small>из 10</small></div></div>`;
  const li=(a,c)=>a.map(t=>`<li class="${c}">${esc(t)}</li>`).join('');
- return`<div class="bvItem">${head}<div class="bvMain">${buildRow(p,true)}<div class="bvVerdict">${esc(lbl(r.score))}</div><ul class="bvLines">${li(r.pros,'p')}${li(r.cons,'m')}</ul>${r.need.length?`<div class="bvNeed"><b>Чего не хватило:</b> ${esc(r.need.join(' · '))}</div>`:''}</div><div class="bvScore ${cls(r.score)}"><strong>${r.score}</strong><small>из 10</small><div class="bar"><i style="width:${r.score*10}%"></i></div></div></div>`;
+ return`<div class="bvItem">${head}<div class="bvMain">${buildRow(p,true)}<div class="bvVerdict">${esc(lbl(r.score))}</div><ul class="bvLines">${li(r.pros,'p')}${li(r.cons,'m')}</ul>${r.need.map(n=>`<div class="bvNeed"><b>Чего не хватило: ${esc(n.i)}</b>${n.w?` — ${esc(n.w)}`:''}</div>`).join('')}</div><div class="bvScore ${cls(r.score)}"><strong>${r.score}</strong><small>из 10</small><div class="bar"><i style="width:${r.score*10}%"></i></div></div></div>`;
 }
 function threatHtml(team,E){
  const pf=E.prof,foe=team==='Radiant'?'Dire':'Radiant';
