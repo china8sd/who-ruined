@@ -25,7 +25,7 @@
 
   <section id="result" class="hidden">
     <div class="verdict">
-      <div class="verdictTop"><div class="eyebrow ruinerEyebrow">РУИНЕР</div><button id="whyRuinerBtn" type="button" class="whyRuinerBtn">ПОЧЕМУ ИМЕННО ОН?</button><button id="advocateBtn" type="button" class="whyRuinerBtn advBtn">АДВОКАТ</button></div>
+      <div class="verdictTop"><div class="eyebrow ruinerEyebrow">РУИНЕР</div><div class="vBtns"><button id="whyRuinerBtn" type="button" class="whyRuinerBtn">ПОЧЕМУ ИМЕННО ОН?</button><button id="advocateBtn" type="button" class="whyRuinerBtn advBtn">ОПРАВДАТЬ РУИНЕРА</button><button id="draftBtn" type="button" class="whyRuinerBtn draftBtn">ЧЕЙ ДРАФТ ЛУЧШЕ?</button><button id="buildBtn" type="button" class="whyRuinerBtn buildBtn">ОЦЕНКА БИЛДОВ</button></div></div>
       <div class="verdict-grid">
         <div>
           <div class="verdictHero"><img id="culpritHero" src="" alt=""></div><div class="verdictRank"><img id="culpritRank" src="" alt=""><span id="culpritRankText">—</span></div>
@@ -37,14 +37,13 @@
       </div>
       <div id="awards" class="awards verdictAwards"></div>
       <div class="nearRuiner" id="nearRuiner"></div>
-      <div id="advocate" class="advocate hidden"></div>
     </div>
 
     <div class="panel wide resultScreen"><div class="resultScreenHead"><div><div class="eyebrow">MATCH REPORT</div><h2>Итоги матча</h2><p id="resultSubtitle">Ключевые игроки и переломные моменты</p></div><div class="btnRow"><button id="shareResult" type="button" class="shareBtn">КОПИРОВАТЬ ИТОГ</button><button id="shareCard" type="button" class="shareBtn alt">СКАЧАТЬ КАРТОЧКУ</button></div></div></div>
-    <div class="panel wide"><div class="panel-title">Матч в цифрах</div><div id="matchOverview"></div></div>
-    <div class="panel wide"><div class="panel-title">Как менялось преимущество по золоту</div><div id="goldGraph" class="goldGraph"></div><div class="graphLegend"><span><i class="radDot"></i> Radiant</span><span><i class="direDot"></i> Dire</span><span><i class="deathDot"></i> Смерти руинера</span><small>График строится по доступным временным данным OpenDota.</small></div></div>
+    <div class="panel wide statsPanel"><div class="panel-title">Матч в цифрах</div><div id="matchOverview"></div><div class="statsDivider"><span>Как менялось преимущество по золоту</span></div><div id="goldGraph" class="goldGraph"></div><div class="graphLegend"><span><i class="radDot"></i> Radiant</span><span><i class="direDot"></i> Dire</span><span><i class="deathDot"></i> Смерти руинера</span><small>График строится по доступным временным данным OpenDota.</small></div></div>
     <div class="panel wide"><div class="panel-title">Сравнение с ожиданиями</div><p class="panelHint">GPM и XPM сопоставляются с контекстным ориентиром модели. Это не абсолютный рейтинг игрока.</p><div id="roleCompare" class="roleCompare"></div></div>
-    <div class="panel wide winnerPanel"><div class="panel-title">Победившая команда · <span id="winnerTeamName">—</span></div><div id="winnerTeam"></div></div>
+    
+      <div class="panel wide winnerPanel"><div class="panel-title">Победившая команда · <span id="winnerTeamName">—</span></div><div id="winnerTeam"></div></div>
     <div class="panel wide storyPanel">
       <div class="panel-title">Как развивалась игра</div>
       <div id="matchStory"></div>
@@ -64,8 +63,13 @@
 
   </section>
 </main>
-<div id="whyRuinerModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="whyRuinerTitle"><div class="whyModalBackdrop" data-close-why="1"></div><div class="whyModalCard"><div class="whyModalHead"><h2 id="whyRuinerTitle">Почему именно он?</h2><button id="closeWhyRuiner" type="button" class="closeWhy" aria-label="Закрыть">×</button></div><p class="whyModalIntro">Разбор основан на показателях матча и доступных игровых событиях. Это оценка модели, а не утверждение, что один игрок единолично проиграл матч.</p><div id="whyRuinerContent" class="reasons"></div></div></div>
+<div id="whyRuinerModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="whyRuinerTitle"><div class="whyModalBackdrop" data-close-why="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="whyRuinerTitle">Почему именно он?</h2><button id="closeWhyRuiner" type="button" class="closeWhy" aria-label="Закрыть">×</button></div><p class="whyModalIntro">Разбор основан на показателях матча и доступных игровых событиях. Это оценка модели, а не утверждение, что один игрок единолично проиграл матч.</p><div id="whyRuinerContent" class="reasons"></div></div></div>
+<div id="advModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="advTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="advTitle">Оправдать руинера?</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="advContent"></div></div></div>
+<div id="draftModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="draftTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="draftTitle">Чей драфт лучше?</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="draftBox"></div></div></div>
+<div id="buildModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="buildTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard bvCard"><div class="whyModalHead"><h2 id="buildTitle">Оценка билдов</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="buildBox"></div></div></div>
 <script src="js/app.js"></script>
 <script src="js/extras.js"></script>
+<script src="js/builds.js"></script>
+<script src="js/why.js"></script>
 </body>
 </html>

@@ -5,7 +5,7 @@ const clamp=(x,a=0,b=100)=>Math.max(a,Math.min(b,x));
 const fmt=n=>(n||0).toLocaleString("ru-RU");
 const time=s=>`${Math.floor((s||0)/60)}:${String(Math.floor((s||0)%60)).padStart(2,"0")}`;
 const esc=s=>String(s??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[m]));
-let HEROES={},ITEMS={};
+let HEROES={},ITEMS={},ITEMS_ID={};
 
 let CAL=1;
 async function run(id){
@@ -14,16 +14,17 @@ async function run(id){
  try{
   const [mr,h,i]=await Promise.all([fetch(`${API}/matches/${id}`),cachedJson("heroes"),cachedJson("items")]);
   if(!mr.ok)throw httpErr(mr.status);
-  const m=await mr.json(); HEROES=h; ITEMS=i;
+  const m=await mr.json(); HEROES=h; ITEMS=i; ITEMS_ID=Object.fromEntries(Object.entries(i||{}).filter(([k,v])=>v&&v.id!=null).map(([k,v])=>[v.id,{...v,key:k}]));
   await analyze(m); setStatus(`Матч ${id} обработан`);
  }catch(err){track("error/"+(err instanceof TypeError?"network":(err.code||"other")));setStatus(err instanceof TypeError?t("Нет соединения с OpenDota. Проверь интернет."):err.message,"err")}
 }
 $("form").addEventListener("submit",e=>{e.preventDefault();run($("matchId").value)});
 
+function tfp(f,p){const a=f&&f.players;if(!a)return null;return (p.idx!=null&&a[p.idx])||a[p.player_slot]||null;}
 function heroData(p){return HEROES[String(p.hero_id)]||HEROES[p.hero_id]||{};}
 function heroName(p){return heroData(p).localized_name||`Hero #${p.hero_id}`;}
 function heroImg(p){const h=heroData(p); if(h.img)return `https://cdn.cloudflare.steamstatic.com${h.img}`; return `${CDN}/heroes/${String(h.localized_name||'').toLowerCase().replace(/[^a-z0-9]/g,'')}.png`;}
-function itemData(id){return ITEMS[String(id)]||ITEMS[id]||{};}
+function itemData(id){return ITEMS_ID[id]||ITEMS[String(id)]||{};}
 function itemImg(id){const it=itemData(id); if(it.img)return `https://cdn.cloudflare.steamstatic.com${it.img}`; return "";}
 function itemName(id){return itemData(id).dname||itemData(id).localized_name||"Item";}
 function rankName(t){const n=Number(t||0),m=Math.floor(n/10),stars=n%10; const name=({1:"Herald",2:"Guardian",3:"Crusader",4:"Archon",5:"Legend",6:"Ancient",7:"Divine",8:"Immortal"})[m]||"Unranked"; return stars?`${name} ${stars}`:name;}
@@ -125,9 +126,9 @@ function scorePlayer(p,c){
  const deaths=p.deaths||0,kills=p.kills||0,assists=p.assists||0;
  const kp=c.teamKills?100*(kills+assists)/c.teamKills:0, dmgShare=100*(p.hero_damage||0)/c.teamDamage;
  const farm=p.gold_per_min||0, duration=c.duration||1, role=p.roleInfo?.role||'Unknown', w=roleWeights(role);
- const fights=(c.m.teamfights||[]).filter(f=>f.players&&f.players[p.player_slot]);
+ const fights=(c.m.teamfights||[]).filter(f=>tfp(f,p));
  let fightEvents=0, lowFightEvents=0;
- for(const f of fights){const x=f.players[p.player_slot]; if((x.kills+x.assists+x.deaths)>0)fightEvents++; if(x.deaths>0&&x.damage<500)lowFightEvents++;}
+ for(const f of fights){const x=tfp(f,p); if((x.kills+x.assists+x.deaths)>0)fightEvents++; if(x.deaths>0&&x.damage<500)lowFightEvents++;}
  // Role-aware expectations: supports are not judged by core farm, cores are not rescued by high KDA alone.
  const hk=heroAdj(p,role); const expectedGpm=CAL*hk.g*({"Pos 1 · Carry":520,"Pos 2 · Mid":480,"Pos 3 · Offlane":420,"Pos 4 · Soft Support":330,"Pos 5 · Hard Support":270}[role]||400);
  const expectedDamage=hk.d*({"Pos 1 · Carry":.23,"Pos 2 · Mid":.22,"Pos 3 · Offlane":.18,"Pos 4 · Soft Support":.11,"Pos 5 · Hard Support":.09}[role]||.17);
@@ -158,7 +159,9 @@ function scorePlayer(p,c){
  if(objectivePenalty>5) reasons.push([`Слабое давление на объекты`,`${fmt(p.tower_damage)} урона по строениям.`]);
  if(utilityCredit>4) reasons.push([`Положительный вклад поддержки`,`Вклад в вижен/лечение снижает итоговый blame.`]);
  if(!reasons.length) reasons.push([`Нет одного доминирующего провала`,`Score собран из нескольких сигналов с учётом предполагаемой роли.`]);
- return {...p,leaver:(p.leaver_status||0)>=2,score:Math.round(score),confidence:Math.round(confidence),reasons,kp,dmgShare,role,roleConfidence:p.roleInfo?.confidence||0};
+ const parts={farm:100*w.farm*(farmGap/18),fight:100*w.fight*(fightPenalty/33),error:100*w.error*(errorPenalty/27),obj:100*w.obj*(objectivePenalty/11),util:100*w.utility*Math.max(0,(6-utilityCredit)/6),waste:resourceWaste,items:ix.reduce((a,x)=>a+x.pen,0)};
+ const exp={gpm:expectedGpm,dmg:expectedDamage*100,kp:expectedKP,obj:objectiveTarget};
+ return {...p,parts,exp,leaver:(p.leaver_status||0)>=2,score:Math.round(score),confidence:Math.round(confidence),reasons,kp,dmgShare,role,roleConfidence:p.roleInfo?.confidence||0};
 }
 
 function render(m,all,players,culprit,closeRuiner){
@@ -244,9 +247,9 @@ function matchStory(m,all,players,culprit){
 }
 function findTurningPoint(m,all,p,loseTeam,winTeam){
  const fights=(m.teamfights||[]).map(f=>{
-   const lp=all.filter(x=>x.team===loseTeam).reduce((a,x)=>{const z=f.players&&f.players[x.player_slot];return a+(z?(z.kills||0)*120+(z.assists||0)*45-(z.deaths||0)*150+(z.damage||0)*.08:0)},0);
-   const wp=all.filter(x=>x.team===winTeam).reduce((a,x)=>{const z=f.players&&f.players[x.player_slot];return a+(z?(z.kills||0)*120+(z.assists||0)*45-(z.deaths||0)*150+(z.damage||0)*.08:0)},0);
-   const cp=f.players&&f.players[p.player_slot];
+   const lp=all.filter(x=>x.team===loseTeam).reduce((a,x)=>{const z=tfp(f,x);return a+(z?(z.kills||0)*120+(z.assists||0)*45-(z.deaths||0)*150+(z.damage||0)*.08:0)},0);
+   const wp=all.filter(x=>x.team===winTeam).reduce((a,x)=>{const z=tfp(f,x);return a+(z?(z.kills||0)*120+(z.assists||0)*45-(z.deaths||0)*150+(z.damage||0)*.08:0)},0);
+   const cp=tfp(f,p);
    return {f,score:wp-lp,cp};
  }).sort((a,b)=>b.score-a.score);
  const best=fights.find(x=>x.cp&&(x.cp.deaths||0)>0)||fights[0];
@@ -282,14 +285,14 @@ function overview(m,all){
 }
 function winnerPlayerCard(p){
  const kd=`${p.kills||0}/${p.deaths||0}/${p.assists||0}`;
- return `<div class="winnerPlayer"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div class="winnerPlayerMain"><b>${esc(p.personaname||`Игрок ${p.idx+1}`)}</b><span>${esc(heroName(p))}</span><small>K/D/A ${kd} · GPM ${fmt(p.gold_per_min)} · XPM ${fmt(p.xp_per_min)} · Урон ${fmt(p.hero_damage)}</small></div><strong>${fmt(p.net_worth)} NW</strong></div>`;
+ return `<div class="winnerPlayer"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div class="winnerPlayerMain"><b>${esc(p.personaname||`Игрок ${p.idx+1}`)}</b><span>${esc(heroName(p))}</span><small>K/D/A ${kd} · GPM ${fmt(p.gold_per_min)} · XPM ${fmt(p.xp_per_min)} · Урон ${fmt(p.hero_damage)}</small>${buildRow(p,true)}</div><strong>${fmt(p.net_worth)} NW</strong></div>`;
 }
 function playerCard(p,isCulprit){
  const kd=`${p.kills||0}/${p.deaths||0}/${p.assists||0}`, items=itemsOf(p);
  return `<div class="playerCard ${isCulprit?'culprit':''}">
   <div class="playerHead"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><div class="pname">${esc(p.personaname||'Unknown')}${p.leaver?' <span class="leaverTag">ЛИВЕР/АФК</span>':''}</div><div class="heroName">${esc(heroName(p))}</div></div><div class="pScore">${p.score}</div></div>
   <div class="statgrid"><span>K/D/A <b>${kd}</b></span><span>GPM <b>${fmt(p.gold_per_min)}</b></span><span>XPM <b>${fmt(p.xp_per_min)}</b></span><span>Last Hits <b>${fmt(p.last_hits)}</b></span><span>Hero DMG <b>${fmt(p.hero_damage)}</b></span><span>DMG Share <b>${p.dmgShare.toFixed(1)}%</b></span><span>KP <b>${p.kp.toFixed(0)}%</b></span><span>Tower DMG <b>${fmt(p.tower_damage)}</b></span><span>Net Worth <b>${fmt(p.net_worth)}</b></span><span>Healing <b>${fmt(p.hero_healing)}</b></span><span>Wards <b>${fmt((p.obs_placed||0)+(p.sentry_placed||0))}</b></span><span>Denies <b>${fmt(p.denies)}</b></span></div>
-  <div class="build"><span>Сборка</span>${items.length?items.map(id=>`<img title="${esc(itemName(id))}" src="${itemImg(id)}" onerror="this.style.visibility='hidden'">`).join(''):'<em>нет данных</em>'}</div>
+  ${buildRow(p)}
  </div>`;
 }
 function buildEvents(m,p){
@@ -299,7 +302,7 @@ function buildEvents(m,p){
 
  // 1) Реальные teamfight events, если OpenDota их вернул.
  for(const f of (m.teamfights||[])){
-   const x=f.players&&f.players[slot]; if(!x)continue;
+   const x=tfp(f,p); if(!x)continue;
    const dmg=x.damage||0, k=x.kills||0, a=x.assists||0, d=x.deaths||0;
    if(d>0){
      out.push({t:time(f.start||0),player:eventPlayer,title:`Смерть в командной драке`,text:`${fmt(dmg)} hero damage • ${k} kills • ${a} assists • ${d} death`,danger:dmg<500,why:dmg<500?"Смерть произошла при небольшом личном вкладе в драку.":"Смерть есть, но у игрока был заметный вклад уроном — поэтому эпизод не считается автоматической ошибкой."});

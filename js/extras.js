@@ -57,22 +57,39 @@ function deathMarks(m,all,p,n,W,H,pad,max,series){
   const d=(series[i0].r-series[i0].d)*(1-f)+(series[i1].r-series[i1].d)*f;
   return`<circle class="deathMark" cx="${pad+i*(W-2*pad)/(n-1)}" cy="${H/2-d/max*(H/2-pad)}" r="5"><title>${esc(p.personaname||'')} · ${time(s)}</title></circle>`}).join('')}
 
-/* ---- advocate ---- */
-function advocateHtml(m,p,all,pl){
- const rk=f=>[...pl].sort((a,b)=>f(b)-f(a)).indexOf(p)+1,pts=[],avgD=pl.reduce((a,x)=>a+(x.deaths||0),0)/pl.length;
- const dr=rk(x=>x.hero_damage||0),tr=rk(x=>x.tower_damage||0);
- if(p.kp>=60)pts.push([`Участие в ${p.kp.toFixed(0)}% убийств команды`,'Он был в гуще событий, а не пассивно фармил.']);
- if(dr<=2)pts.push([`№${dr} по урону героям в команде`,`${fmt(p.hero_damage)} урона — ${p.dmgShare.toFixed(1)}% командного.`]);
- if((p.tower_damage||0)>0&&tr<=2)pts.push([`№${tr} по урону строениям`,`${fmt(p.tower_damage)} урона по зданиям.`]);
- if((p.deaths||0)<=avgD-1)pts.push(['Умирал реже среднего',`${p.deaths||0} смертей при среднем ${avgD.toFixed(1)} по команде.`]);
- if(rk(x=>x.gold_per_min||0)===1)pts.push(['Лучший фарм в команде',`${fmt(p.gold_per_min)} GPM.`]);
- if((p.hero_healing||0)>3000||(p.obs_placed||0)>=5)pts.push(['Вклад поддержки','Лечение и вижен помогали команде, даже если это не видно в KDA.']);
+/* ---- defend the ruiner (honest, stats-based) ---- */
+function cleanReason(x){return[String(x[0]).replace(/ для (Pos [1-5].*)$/,'').replace(/Pos [1-5] · (Carry|Mid|Offlane|Soft Support|Hard Support)/g,'роль'),String(x[1]).replace(/для Pos [1-5] · (Carry|Mid|Offlane|Soft Support|Hard Support)/g,'с учётом роли')]}
+function defenseHtml(){
+ const{m,all,players:pl,culprit:p}=CUR,n=pl.length,avgD=pl.reduce((a,x)=>a+(x.deaths||0),0)/n,rk=f=>[...pl].sort((a,b)=>f(b)-f(a)).indexOf(p)+1;
+ const dr=rk(x=>x.hero_damage||0),tr=rk(x=>x.tower_damage||0),pro=[],ctx=[],con=[];
+ if(p.kp>=60)pro.push([`Участие в ${p.kp.toFixed(0)}% убийств команды`,'Он был в гуще событий, а не пассивно фармил.']);
+ if(dr<=2)pro.push([`№${dr} по урону героям в команде`,`${fmt(p.hero_damage)} урона — ${p.dmgShare.toFixed(1)}% командного.`]);
+ if((p.tower_damage||0)>0&&tr<=2)pro.push([`№${tr} по урону строениям`,`${fmt(p.tower_damage)} урона по зданиям.`]);
+ if((p.deaths||0)<=avgD-1)pro.push(['Умирал реже среднего',`${p.deaths||0} смертей при среднем ${avgD.toFixed(1)} по команде.`]);
+ if(rk(x=>x.gold_per_min||0)===1)pro.push(['Лучший фарм в команде',`${fmt(p.gold_per_min)} GPM.`]);
+ if((p.hero_healing||0)>3000||(p.obs_placed||0)>=5)pro.push(['Вклад поддержки','Лечение и вижен помогали команде, даже если это не видно в KDA.']);
  const wt=m.radiant_win?'Radiant':'Dire',nw=tm=>all.filter(x=>x.team===tm).reduce((a,x)=>a+(x.net_worth||0),0),gap=nw(wt)-nw(p.team);
- if(gap>8000)pts.push(['Команда в целом проигрывала по экономике',`Соперник опережал на ${fmt(gap)} net worth — это не вина одного игрока.`]);
- if(pl.some(x=>x.leaver))pts.push(['В команде был ливер/АФК','Игра 4 на 5 почти не оставляет шансов независимо от одного игрока.']);
- if(!pts.length)pts.push(['Сильных сторон по статистике немного','Но поражение всё равно остаётся командным: оценка модели — не приговор.']);
- return`<h3>${t('Адвокат руинера')}</h3><ul>${pts.map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join('')}</ul>`}
-$('advocateBtn').onclick=()=>track('click/advocate')||$('advocate').classList.toggle('hidden');
+ if(gap>8000)ctx.push(['Вся команда проигрывала по экономике',`Соперник опережал на ${fmt(gap)} net worth — это не вина одного игрока.`]);
+ if(pl.some(x=>x.leaver))ctx.push(['В команде был ливер/АФК','Игра 4 на 5 почти не оставляет шансов независимо от одного игрока.']);
+ const D=CUR.draft;if(D&&D.aw-D.al>1.5)ctx.push(['Драфт был не в вашу пользу',`Герои вашей команды выигрывали у вражеских реже: ${D.al.toFixed(1)}% против ${D.aw.toFixed(1)}%.`]);
+ if((p.deaths||0)>avgD+1.5)con.push(['Много смертей',`${p.deaths} смертей при среднем ${avgD.toFixed(1)} по команде.`]);
+ if(p.kp<40)con.push(['Мало участия в боях',`Всего ${p.kp.toFixed(0)}% убийств команды с его участием.`]);
+ if(dr>=n-1)con.push(['Один из самых низких уронов',`${fmt(p.hero_damage)} урона героям — ${p.dmgShare.toFixed(1)}% командного.`]);
+ (p.reasons||[]).slice(0,4).forEach(x=>{const c=cleanReason(x);if(!con.some(y=>y[0].toLowerCase()===c[0].toLowerCase()))con.push(c)});
+ const sc=p.score,strong=pro.length+ctx.length;let cls,title,text;
+ if(sc>=70&&strong<=1){cls='no';title='Оправдать не получится';text=`Влияние на поражение ${sc}/100 — одно из самых высоких, а смягчающих обстоятельств по данным почти нет. Честно: по статистике оправдать этого игрока не выйдет.`}
+ else if(sc>=70){cls='part';title='Оправдать можно лишь отчасти';text=`Вина всё равно высокая (${sc}/100), но есть факторы, которые её немного смягчают. Полностью оправдать нельзя, но он не единственная причина поражения.`}
+ else if(sc>=45){cls='mid';title='Скорее частично оправдан';text=`Оценка средняя (${sc}/100): ошибки есть, но они не выглядят решающими${strong?', а в защиту есть реальные аргументы':''}.`}
+ else{cls='ok';title='Оправдан';text=`Оценка низкая (${sc}/100): по статистике серьёзной вины на нём нет, поражение скорее командное.`}
+ const li=a=>a.map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join('');
+ return`<div class="advHead"><img src="${esc(heroImg(p))}" alt=""><div><b>${esc(p.personaname||'Игрок')}</b><span>${esc(heroName(p))} · ${esc(impactLabel(sc))}</span></div><div class="advScore">${sc}<small>/100</small></div></div>`
+  +`<div class="advCols"><div class="advCol pro"><h3>Что говорит в его защиту</h3>${strong?`<ul>${li(pro.concat(ctx))}</ul>`:'<p class="advEmpty">По статистике защитить почти нечем.</p>'}</div><div class="advCol con"><h3>Чего не оправдать</h3>${con.length?`<ul>${li(con)}</ul>`:'<p class="advEmpty">Явных претензий по статистике нет.</p>'}</div></div>`
+  +`<div class="advVerdict ${cls}"><b>${esc(title)}</b><p>${esc(text)}</p></div><p class="advNote">Вывод строится только на статистике матча. Он не видит коммуникацию, решения команды и ситуации в драках, которых нет в данных OpenDota.</p>`}
+function openModal(id,html){const el=$(id);if(html!=null)$('advContent').innerHTML=html;el.classList.remove('hidden');applyLang(el)}
+['advModal','draftModal'].forEach(id=>$(id).addEventListener('click',e=>{if(e.target.dataset.close)$(id).classList.add('hidden')}));
+document.addEventListener('keydown',e=>{if(e.key==='Escape')['advModal','draftModal'].forEach(id=>$(id).classList.add('hidden'))});
+$('advocateBtn').onclick=()=>{if(!CUR)return;track('click/advocate');openModal('advModal',defenseHtml())};
+$('draftBtn').onclick=()=>{if(!CUR)return;track('click/draft');openModal('draftModal')};
 
 /* ---- history ---- */
 function histGet(){try{return JSON.parse(localStorage.getItem('wr_hist')||'[]')}catch(e){return[]}}
@@ -109,6 +126,56 @@ document.querySelectorAll('.telegram').forEach(a=>a.addEventListener('click',()=
 $('betboomBtn').addEventListener('click',()=>track('click/betboom'));
 $('shareCard').onclick=()=>{track('click/share-card');shareCard()};$('shareResult').addEventListener('click',()=>track('click/share-text'));$('whyRuinerBtn').addEventListener('click',()=>track('click/why-him'));
 
+/* ---- builds: final items for every player, neutral item separated ---- */
+function itemTitle(id){const d=itemData(id);return esc(itemName(id)+(d.cost?` · ${d.cost} gold`:''))}
+function buildRow(p,mini){
+ const main=[0,1,2,3,4,5].map(k=>p[`item_${k}`]).filter(Boolean),bp=[0,1,2].map(k=>p[`backpack_${k}`]).filter(Boolean),nt=p.item_neutral;
+ const im=(id,c)=>`<img class="${c||''}" title="${itemTitle(id)}" alt="${esc(itemName(id))}" src="${itemImg(id)}" loading="lazy" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'itemTxt',textContent:this.alt}))">`;
+ const any=main.length||bp.length||nt;
+ return `<div class="build${mini?' mini':''}">${mini?'':'<span>Сборка</span>'}${any?main.map(x=>im(x)).join('')+bp.map(x=>im(x,'bp')).join('')+(nt?'<i class="nSep"></i>'+im(nt,'neutral'):''):'<em>нет данных</em>'}</div>`}
+
+/* ---- draft: hero-vs-hero matchups (OpenDota /heroes/{id}/matchups, cached 24h) ---- */
+Object.assign(EN,{'ОПРАВДАТЬ РУИНЕРА':'DEFEND THE RUINER','ЧЕЙ ДРАФТ ЛУЧШЕ?':'WHOSE DRAFT IS BETTER?','Оправдать руинера?':'Defend the ruiner?','Что говорит в его защиту':'In his defence','Чего не оправдать':'What can\'t be excused','Чей драфт лучше?':'Whose draft is better?','Драфт: матчапы героев':'Draft: hero matchups','Как герои каждой команды в среднем играют против героев соперника. Это статистика героев, а не оценка игроков.':'How each team\'s heroes perform against the enemy heroes on average. This is hero statistics, not a player rating.','Победители':'Winners','Проигравшие':'Losers','Средний винрейт против героев соперника':'Average win rate vs enemy heroes','Загружаем матчапы…':'Loading matchups…','Не удалось загрузить матчапы героев.':'Could not load hero matchups.','слабее против':'weaker vs','Драфт был в пользу победителей — часть поражения заложена на пике.':'The draft favoured the winners — part of the loss was baked in at the pick stage.','Драфт был в вашу пользу — проигрыш не из-за пика.':'The draft favoured the losing team — the loss was not about the picks.','Драфт примерно равный.':'The draft was roughly even.','Самые невыгодные пары':'Most unfavourable pairs','Драфт был не в вашу пользу':'The draft was against you','Повторить':'Retry'});
+let MU_ST=0;const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+async function heroMatchups(id){
+ const k='wr_mu2_'+id;try{const c=JSON.parse(localStorage.getItem(k)||'null');if(c&&Date.now()-c.t<864e5)return c.d}catch(e){}
+ for(let a=0;a<3;a++){
+  try{await sleep(a?0:220);const r=await fetch(`${API}/heroes/${id}/matchups`);MU_ST=r.status;
+   if(r.status===429){await sleep(1500*(a+1));continue}
+   if(!r.ok)return null;
+   const d=await r.json(),o={};(Array.isArray(d)?d:[]).forEach(x=>{if(x&&x.hero_id!=null)o[x.hero_id]=[+(x.games_played??x.games??0),+(x.wins??x.win??0)]});
+   if(Object.keys(o).length)try{localStorage.setItem(k,JSON.stringify({t:Date.now(),d:o}))}catch(e){}return o
+  }catch(e){MU_ST='net';await sleep(500)}
+ }
+ return null}
+async function renderDraft(m,all,losers){
+ const box=$('draftBox'),MIN=40,hi=id=>HEROES[id]&&HEROES[id].img?`https://cdn.cloudflare.steamstatic.com${HEROES[id].img}`:'',hn=id=>(HEROES[id]&&HEROES[id].localized_name)||'Hero';
+ box.innerHTML=`<div class="empty">${esc(t('Загружаем матчапы…'))}</div>`;
+ const ids=[...new Set(all.map(p=>p.hero_id))],tabs={};
+ for(const id of ids){tabs[id]=await heroMatchups(id);if(!CUR||CUR.m!==m)return}
+ const pairs=[];
+ all.forEach(a=>all.filter(b=>b.team!==a.team).forEach(b=>{const e=tabs[a.hero_id]&&tabs[a.hero_id][b.hero_id];if(e&&e[0]>=MIN)pairs.push({a,b,wr:e[1]/e[0],g:e[0],z:(e[1]/e[0]-.5)*2*Math.sqrt(e[0])})}));
+ if(pairs.length<10){const got=ids.filter(x=>tabs[x]).length,ent=ids.reduce((z,x)=>z+(tabs[x]?Object.keys(tabs[x]).length:0),0),mx=ids.reduce((z,x)=>tabs[x]?Math.max(z,...Object.values(tabs[x]).map(v=>v[0])):z,0);box.innerHTML=`<div class="empty">${esc(t('Не удалось загрузить матчапы героев.'))} <small>(${got}/${ids.length} · ${MU_ST} · ${ent} · ${mx})</small> <button type="button" class="draftRetry">${esc(t('Повторить'))}</button></div>`;applyLang(box);return}
+ const lt=losers[0].team,wt=lt==='Radiant'?'Dire':'Radiant',L=all.filter(p=>p.team===lt),W=all.filter(p=>p.team===wt);
+ const avg=tm=>{const x=pairs.filter(q=>q.a.team===tm);return x.length?x.reduce((z,q)=>z+q.wr,0)/x.length*100:50};
+ const al=avg(lt),aw=avg(wt),diff=aw-al;CUR.draft={al,aw,lt,wt};
+ const hv=p=>{const x=pairs.filter(q=>q.a===p);return x.length?x.reduce((z,q)=>z+q.wr,0)/x.length*100:null};
+ const hero=p=>{const v=hv(p),w=v==null?0:Math.max(3,Math.min(100,(v-40)/20*100));return`<div class="dHero"><img src="${esc(hi(p.hero_id))}" alt=""><b>${esc(hn(p.hero_id))}</b><i class="dBar"><u class="${v>=50?'up':'dn'}" style="width:${w}%"></u></i><span>${v==null?'—':v.toFixed(1)+'%'}</span></div>`};
+ const cell=(a,b)=>{const q=pairs.find(z=>z.a===a&&z.b===b);if(!q)return'<td class="mx na">—</td>';const v=q.wr*100;return`<td class="mx ${v>=52?'g':v<=48?'r':''}" title="${esc(hn(a.hero_id))} vs ${esc(hn(b.hero_id))} · ${q.g}">${v.toFixed(0)}</td>`};
+ const pr=q=>`<div class="dPair ${q.a.team===lt?'lose':'win'}"><img src="${esc(hi(q.a.hero_id))}" alt=""><b>${esc(hn(q.a.hero_id))}</b><em>${q.wr<.5?'слабее против':'сильнее против'}</em><img src="${esc(hi(q.b.hero_id))}" alt=""><b>${esc(hn(q.b.hero_id))}</b><span class="${q.wr<.5?'neg':'pos'}">${(q.wr*100).toFixed(1)}% · ${q.g}</span></div>`;
+ const worst=pairs.filter(q=>q.wr<.5).sort((x,y)=>x.z-y.z).slice(0,4),best=pairs.filter(q=>q.wr>.5).sort((x,y)=>y.z-x.z).slice(0,4);
+ const head=Math.abs(diff)<1?'Драфты примерно равны':diff>0?`Драфт победителей (${wt}) был лучше на ${diff.toFixed(1)} п.п.`:`Драфт проигравших (${lt}) был лучше на ${(-diff).toFixed(1)} п.п.`;
+ const sub=diff>1?'Часть поражения была заложена на этапе пика.':diff<-1?'По пикам вы были впереди — проиграли не из-за драфта.':'Пики не объясняют исход матча.';
+ box.innerHTML=`<div class="draftHeadline ${diff>1?'w':diff<-1?'l':'e'}"><b>${esc(head)}</b><span>${esc(sub)}</span></div>`
+  +`<p class="draftNote">Разница в 1–2 п.п. — это мало: исход игры сильнее зависит от игроков, чем от пиков.</p>`
+  +`<div class="draftSummary"><div class="dWin"><span>${esc(t('Победители'))} · ${wt}</span><b>${aw.toFixed(1)}%</b></div><div class="dLose"><span>${esc(t('Проигравшие'))} · ${lt}</span><b>${al.toFixed(1)}%</b></div></div><p class="draftNote">${esc(t('Средний винрейт против героев соперника'))}</p>`
+  +`<div class="draftCols"><div><div class="draftHead">${esc(t('Победители'))} · ${wt}</div>${W.map(hero).join('')}</div><div><div class="draftHead">${esc(t('Проигравшие'))} · ${lt}</div>${L.map(hero).join('')}</div></div>`
+  +`<div class="draftHead">Матрица: винрейт героя проигравших (строка) против героя победителей (столбец), %</div><div class="mxWrap"><table class="mxTable"><tr><th></th>${W.map(p=>`<th><img src="${esc(hi(p.hero_id))}" title="${esc(hn(p.hero_id))}" alt=""></th>`).join('')}</tr>${L.map(a=>`<tr><th><img src="${esc(hi(a.hero_id))}" title="${esc(hn(a.hero_id))}" alt=""></th>${W.map(b=>cell(a,b)).join('')}</tr>`).join('')}</table></div>`
+  +(worst.length?`<div class="draftHead">${esc(t('Самые невыгодные пары'))}</div><div class="draftPairs">${worst.map(pr).join('')}</div>`:'')
+  +(best.length?`<div class="draftHead">Самые выгодные пары</div><div class="draftPairs">${best.map(pr).join('')}</div>`:'')
+  +`<p class="draftNote">Как считали: берётся общая статистика OpenDota «герой против героя» (в паре минимум ${MIN} игр), считается средний винрейт героев каждой команды против вражеских. Это статистика героев вообще, а не этого матча, и не оценка игроков. Зелёные клетки в матрице — от 52%, красные — до 48%.</p>`;
+ applyLang(box)}
+$('draftBox').addEventListener('click',e=>{if(e.target.closest('.draftRetry')&&CUR)renderDraft(CUR.m,CUR.all,CUR.players)});
 /* ---- post-render hook ---- */
 const _render=render;
 render=function(m,all,players,culprit,closeRuiner){
@@ -117,12 +184,12 @@ render=function(m,all,players,culprit,closeRuiner){
  try{history.replaceState(null,'','?match='+id)}catch(e){}
  track('analyze');track('ruiner/'+heroName(culprit).toLowerCase().replace(/\s+/g,'-'),'Руинер: '+heroName(culprit));
  histAdd({id,name:culprit.personaname||'?',hero:heroName(culprit),score:culprit.score});
- const ad=$('advocate');ad.classList.add('hidden');ad.innerHTML=advocateHtml(m,culprit,all,players);
  const hint=$('roleCompare').parentElement.querySelector('.panelHint');
  if(hint){hint.dataset.base=hint.dataset.base||hint.textContent;hint.innerHTML=esc(hint.dataset.base)+(CAL!==1?`<br><span class="calNote">${esc(t('Ориентиры скорректированы под ранг матча'))} ×${CAL.toFixed(2)}</span>`:'')}
  const unparsed=!(m.teamfights&&m.teamfights.length)&&!m.players.some(p=>p.gold_t),lv=players.filter(x=>x.leaver);
  $('parseNotice').innerHTML=(unparsed?`<div class="notice">${esc(t('Матч не распарсен OpenDota — разбор будет менее точным.'))} <button type="button" id="reqParse">${esc(t('Запросить парсинг'))}</button></div>`:'')
   +(lv.length?`<div class="notice">${esc(t('В проигравшей команде был ливер/АФК — он исключён из выбора руинера:'))} ${esc(lv.map(x=>x.personaname||heroName(x)).join(', '))}</div>`:'');
+ renderDraft(m,all,players);
  applyLang();
 };
 
