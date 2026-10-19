@@ -1,4 +1,4 @@
-# Who Ruined v6.3
+# Who Ruined v6.5
 
 Match ID → OpenDota → role-aware match analysis → verdict.
 
@@ -39,3 +39,10 @@ Match ID → OpenDota → role-aware match analysis → verdict.
 - v6.1: кнопки «ПОЧЕМУ ИМЕННО ОН?», «ОПРАВДАТЬ РУИНЕРА», «ЧЕЙ ДРАФТ ЛУЧШЕ?» и новая «ОЦЕНКА БИЛДОВ» собраны в один компактный ряд; «ОЦЕНКА БИЛДОВ» (js/builds.js) — окно с 10 героями матча, билд каждого оценивается от 1 до 10 с учётом длительности, позиции, типа урона врага (магия/физика), контроля, саммонеров, невидимок, уклонения; показывает плюсы/минусы, «чего не хватило» и кому выгоднее всего был Pipe / Crimson Guard / детекция.
 - v6.2: «ПОЧЕМУ ИМЕННО ОН?» — подробный разбор (js/why.js): из чего сложился балл (разбивка по штрафам), показатели против ориентира роли с местом в команде, каждая смерть по времени (вне драки / в драке, счёт по золоту, потерянная вскоре постройка), сравнение с оппонентом на той же позиции (в т.ч. 10-я минута), оценка билда, смягчающие факторы и совет. Исправлено: данные teamfights для игроков Dire искались по player_slot вместо порядкового номера (функция tfp в app.js).
 - v6.3: советы по предметам (js/builds.js) сделаны сбалансированнее: саппортам — Glimmer Cape при ≥55% магии у врага и Solar Crest при ≥55% физики (с объяснением, чем это полезно кору); совет про Blink Dagger убран полностью; BKB не советуется Phantom Lancer, Spectre, Lifestealer, Naga Siren и саппортам; MKB не советуется Spectre, Drow Ranger, Phantom Lancer (PL — Bloodthorn), и только героям, которые бьют руками; кэрри-милишникам без собственного контроля советуется Skull Basher; Pipe/Crimson советуются позиции 3 (или 4, если третьей нет).
+- v6.4: правила советов по предметам переписаны под списки героев (js/builds.js, константы *_H в начале файла — их легко править):
+  - MKB/Bloodthorn не советуются героям из списка NO_MKB (Axe, Bristleback, Centaur, Chaos Knight, Dawnbreaker, Ember, Doom, Earth Spirit, Earthshaker, Elder Titan, Huskar, Kunkka, Largo, Mars, Slardar, Underlord, Bounty Hunter, Drow, Hoodwink, Lone Druid, Meepo, Mirana, Abaddon, Spectre; Phantom Lancer — Bloodthorn).
+  - Pipe и Crimson Guard — только героям из PIPE_CRIM_H; Hood of Defiance убран; Shiva's больше не советуется.
+  - Solar Crest — героям из SOLAR_H (Omniknight/Vengeful Spirit только на роли саппорта); Glimmer — остальным саппортам при ≥55% магии врага.
+  - Spirit Vessel / Essence Distiller — героям из VESSEL_H; Force Staff — любому саппорту (штраф и замечание, если нет); барабаны ИЛИ Меку (одно из двух) — героям из TEAMITEM_H; Blink Dagger — только героям из BLINK_H (штраф и замечание, если нет).
+  - Непотраченное золото больше не упоминается и не влияет на оценку.
+- v6.5: Hurricane Pike больше не засчитывается саппортам вместо Force Staff — совет и штраф за отсутствие именно Force Staff.

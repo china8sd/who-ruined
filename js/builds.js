@@ -13,9 +13,24 @@ const SUMMON=S(['naga_siren','terrorblade','phantom_lancer','chaos_knight','arc_
 const INVIS_H=S(['riki','clinkz','bounty_hunter','weaver','nyx_assassin','mirana','invoker','treant','broodmother','sand_king']);
 const EVADE_H=S(['phantom_assassin','windrunner','brewmaster']);
 const NO_BKB=S(['phantom_lancer','spectre','life_stealer','naga_siren']); /* иллюзионисты и Lifestealer: BKB не советуем */
-const NO_MKB=S(['spectre','drow_ranger','phantom_lancer']); /* MKB не советуем */
+const HS=a=>S(a.flatMap(n=>[n,n.replace(/_/g,'')])); /* имена героев: и с «_», и без */
+const NO_MKB=HS(['spectre','drow_ranger','phantom_lancer','axe','bristleback','centaur','chaos_knight','dawnbreaker','dawn_breaker','ember_spirit','doom_bringer','earth_spirit','earthshaker','elder_titan','huskar','kunkka','largo','mars','slardar','abyssal_underlord','underlord','bounty_hunter','hoodwink','lone_druid','meepo','mirana','abaddon']); /* MKB и Bloodthorn не советуем */
 const BT_HERO=S(['phantom_lancer']); /* вместо MKB — Bloodthorn */
 const SPELL_CARRIES=S(['storm_spirit','invoker','tinker','leshrac','lina','zuus','skywrath_mage','queenofpain','void_spirit','puck','death_prophet','necrolyte','shadow_fiend','nevermore','pugna','ancient_apparition','techies','earth_spirit','tiny','kunkka','ogre_magi','lion','crystal_maiden','witch_doctor','warlock','dark_willow','muerta','hoodwink','snapfire']);
+/* Pipe и Crimson советуем только этим героям */
+const PIPE_CRIM_H=HS(['axe','centaur','bristleback','rattletrap','dawnbreaker','mars','tusk','treant','undying','visage','ogre_magi','shredder','dark_seer']);
+/* Solar Crest — всегда этим героям (Omniknight и Vengeful Spirit — только на роли саппорта) */
+const SOLAR_H=HS(['rattletrap','elder_titan','ogre_magi','omniknight','phoenix','treant','tusk','undying','bounty_hunter','hoodwink','mirana','vengeful_spirit','ancient_apparition','chen','crystal_maiden','disruptor','enchantress','grimstroke','lich','oracle','ringmaster','shadow_demon','rubick','silencer','warlock','winter_wyvern','dazzle','venomancer']);
+const SOLAR_SUP_ONLY=HS(['omniknight','vengeful_spirit']);
+/* Spirit Vessel / Essence Distiller */
+const VESSEL_H=HS(['rattletrap','earth_spirit','treant','bounty_hunter','hoodwink','ancient_apparition','grimstroke','dark_willow','witch_doctor','nyx_assassin','venomancer']);
+/* Барабаны или Меку (что-то одно) */
+const TEAMITEM_H=HS(['rattletrap','ogre_magi','tusk','treant','undying','bounty_hunter','hoodwink','ancient_apparition','chen','crystal_maiden','jakiro','lich','pugna','shadow_demon','warlock','winter_wyvern','witch_doctor','dazzle']);
+/* герои, которым нужен Blink Dagger */
+const BLINK_H=HS(['axe','centaur','chaos_knight','doom_bringer','dragon_knight','earthshaker','legion_commander','mars','night_stalker','primal_beast','pudge','slardar','sven','tidehunter','tiny','treant','tusk','skeleton_king','templar_assassin','ursa','dark_seer','lion','oracle','obsidian_destroyer','outworld_destroyer','outworld_devourer','puck','rubick','shadow_demon','tinker','batrider','beastmaster','enigma','magnataur','pangolier','sand_king','snapfire']);
+const BLINK=['blink','swift_blink','arcane_blink','overwhelming_blink'];
+const DRUMS=['ancient_janggo','boots_of_bearing'], MEK=['mekansm','guardian_greaves'], FORCE=['force_staff'], VESSEL=['spirit_vessel','essence_distiller'];
+const PR={'Black King Bar':1,'Force Staff':1,'Blink Dagger':2,'Solar Crest':2,'Glimmer Cape':2,'Pipe of Insight':2,'Crimson Guard':2,'Sentry / Dust / Gem':2,'Monkey King Bar / Bloodthorn':2,'Bloodthorn':2,'Mekansm (→ Guardian Greaves)':3,'Ancient Janggo (→ Boots of Bearing)':3,'Spirit Vessel / Essence Distiller':3};
 const CONTROL_ITEMS=['basher','abyssal_blade','sheepstick','orchid','bloodthorn','rod_of_atos','gungir','heavens_halberd'];
 const INVIS_I=['invis_sword','silver_edge'], EVADE_I=['butterfly','radiance'];
 
@@ -24,12 +39,12 @@ const BASE_BOOTS=S(['boots']);
 const UTIL_BOOTS=S(['arcane_boots','tranquil_boots','boots_of_bearing','guardian_greaves']);
 const BKB=['black_king_bar'];
 const ALT_SAVE=['aeon_disk','sphere','lotus_orb','cyclone','wind_waker','ghost','manta','satanic','blade_mail','ethereal_blade'];
-const MAG_DEF=['pipe','hood_of_defiance','eternal_shroud'];
+const MAG_DEF=['pipe','eternal_shroud'];
 const PHYS_DEF=['crimson_guard','shivas_guard','assault','heavens_halberd'];
 const ILLU_DEF=['crimson_guard','shivas_guard','assault','mjollnir','maelstrom','gungir','radiance'];
 const DETECT=['dust','gem','ward_sentry','ward_dispenser'];
 const MKB=['monkey_king_bar','bloodthorn'];
-const UTILITY=['mekansm','guardian_greaves','glimmer_cape','force_staff','hurricane_pike','ghost','rod_of_atos','spirit_vessel','solar_crest','medallion_of_courage','lotus_orb','pavise','holy_locket','ancient_janggo','veil_of_discord','pipe','cyclone','wind_waker','aether_lens','octarine_core','sheepstick','orchid','bloodthorn','nullifier','blink','swift_blink','arcane_blink','overwhelming_blink','black_king_bar','shivas_guard','crimson_guard','refresher','aeon_disk','sphere'];
+const UTILITY=['mekansm','guardian_greaves','glimmer_cape','force_staff','hurricane_pike','ghost','rod_of_atos','spirit_vessel','essence_distiller','solar_crest','medallion_of_courage','lotus_orb','pavise','holy_locket','ancient_janggo','veil_of_discord','pipe','cyclone','wind_waker','aether_lens','octarine_core','sheepstick','orchid','bloodthorn','nullifier','blink','swift_blink','arcane_blink','overwhelming_blink','black_king_bar','shivas_guard','crimson_guard','refresher','aeon_disk','sphere'];
 const CORE_ONLY=S(['bfury','radiance','maelstrom','mjollnir','desolator','greater_crit','butterfly','skadi','satanic','abyssal_blade','monkey_king_bar','moon_shard','rapier','basher','sange_and_yasha','kaya_and_sange','yasha_and_kaya','manta','diffusal_blade','disperser','heart','assault','gungir','armlet']);
 const SUP_ONLY=S(['mekansm','glimmer_cape','ward_dispenser','tranquil_boots','boots_of_bearing','holy_locket','medallion_of_courage','urn_of_shadows','solar_crest','ancient_janggo','pavise','aether_lens','arcane_boots','spirit_vessel']);
 const CHEAP_OK=S(['ward_dispenser','dust','ward_sentry','ward_observer','smoke_of_deceit','tpscroll','cheese','refresher_shard','moon_shard','aghanims_shard','gem']);
@@ -72,14 +87,15 @@ function threatProfile(enemies){
 }
 
 /* ---------- кандидат на командный предмет ---------- */
-function pickCandidate(members,tbl,exclude){
+function pickCandidate(members,tbl,exclude,heroSet){
  let best=null,bs=-1;
  members.forEach(I=>{
   if(I.leaver||(exclude&&exclude.includes(I.p.player_slot)))return;
+   if(heroSet&&!heroSet.has(strip(heroData(I.p).name)))return;
   const r=I.p&&heroData(I.p).roles||[];
   let s=tbl[I.pos]??0;if(r.includes('Durable'))s+=.15;if(r.includes('Initiator'))s+=.1;
   if((I.p.net_worth||0)<4500)s*=.6;
-   if(s<.2)return;
+   if(s<.1)return;
   if(s>bs){bs=s;best=I}
  });
  return best;
@@ -89,7 +105,7 @@ function pickCandidate(members,tbl,exclude){
 function rateOne(I,TC,G){
  const p=I.p,pos=I.pos,inv=I.inv,pf=TC.prof,min=G.min,D=G.D;
  const pros=[],cons=[],need=[];let s=0;
- const N=(i,w)=>need.push({i,w:w||''});
+ const N=(i,w)=>need.push({i,w:w||'',pr:PR[i]??4});
  const P=(d,t)=>{s+=d;pros.push(t)}, C=(d,t)=>{s+=d;cons.push(t)};
  const core=pos<=3, sup=pos>=4, roles=heroData(p).roles||[], hname=strip(heroData(p).name);
  const has=k=>inv.all.has(k);
@@ -99,8 +115,7 @@ function rateOne(I,TC,G){
  /* 1. завершённость билда */
  const empty=6-inv.main.length;
  if(min>=25&&empty>=2)C(-(sup?.25:.4)*Math.min(3,empty-1),`Пустые слоты (${empty}) к ${min}-й минуте — деньги и слоты не использованы`);
- const g=p.gold||0;
- if(min>=20&&g>=2500)C(-Math.min(1.2,.3+(g-2500)/3500*.9),`Не потрачено ${fmt(g)} золота`);
+ 
  const big=inv.main.concat(inv.bp).filter(k=>cost(k)>=2000).length;
  if(min>=14){
   const exp=Math.min(({1:5,2:5,3:4.5,4:3.2,5:2.6})[pos]||4,Math.max(0,(min-12)/7)*(({1:1,2:1,3:.85,4:.6,5:.45})[pos]||.8));
@@ -143,13 +158,13 @@ function rateOne(I,TC,G){
  if(TC.pipe&&min>=20){
   if(TC.pipe.slot===mySlot){
    if(TC.pipe.have)P(.5+.5*TC.pipe.str,`${names(MAG_DEF,inv)} — верное решение против ${Math.round(pf.mag*100)}% магического урона врага`);
-   else{C(-(.4+.6*TC.pipe.str),`Враг бьёт магией (${Math.round(pf.mag*100)}%), а у команды нет Pipe/Hood — по роли ему было выгоднее всех купить`);N('Pipe of Insight / Hood of Defiance',`Враг бьёт магией (${Math.round(pf.mag*100)}%): аура-барьер и сопротивление на всю команду режут урон от спеллов.`);}
+   else{C(-(.4+.6*TC.pipe.str),`Враг бьёт магией (${Math.round(pf.mag*100)}%), а у команды нет Pipe — по роли ему было выгоднее всех купить`);N('Pipe of Insight',`Враг бьёт магией (${Math.round(pf.mag*100)}%): аура-барьер и сопротивление на всю команду режут урон от спеллов.`);}
   }else if(TC.pipe.have&&anyOf(inv,MAG_DEF))P(.4,`${names(MAG_DEF,inv)} против ${Math.round(pf.mag*100)}% магического урона`);
  }
  if(TC.crim&&min>=20){
   if(TC.crim.slot===mySlot){
    if(TC.crim.have)P(.5+.5*TC.crim.str,`${names(TC.crim.list,inv)} — к месту против ${TC.crim.why}`);
-   else{C(-(.4+.6*TC.crim.str),`Против ${TC.crim.why} у команды нет Crimson Guard / Shiva's — ему было выгоднее всех`);N("Crimson Guard / Shiva's Guard",`Против ${TC.crim.why}: броня и блок/замедление на всю команду.`);}
+   else{C(-(.4+.6*TC.crim.str),`Против ${TC.crim.why} у команды нет Crimson Guard — ему было выгоднее всех`);N('Crimson Guard',`Против ${TC.crim.why}: броня и блок/замедление на всю команду.`);}
   }else if(TC.crim.have&&anyOf(inv,TC.crim.list))P(.3,`${names(TC.crim.list,inv)} против ${TC.crim.why}`);
  }
 
@@ -186,23 +201,51 @@ function rateOne(I,TC,G){
   const lim=pos===3?2:1;
   if(so.length>=lim)C(-Math.min(1,.4*so.length),`Саппортские предметы на кор-герое: ${so.map(nm).join(', ')}`);
  }
- if(sup&&min>=22){
-  const u=inv.main.concat(inv.bp).filter(k=>UTILITY.includes(k));
-  const mg=Math.round(pf.mag*100),ph=100-mg,hasG=has('glimmer_cape'),hasS=has('solar_crest');
-  if(hasG&&pf.mag>=.5)P(.5,`Glimmer Cape: против ${mg}% магического урона даёт союзнику магрезист и невидимость — спасает кора от бурста`);
-  else if(hasS&&pf.phys>=.5)P(.5,`Solar Crest: против ${ph}% физического урона режет броню врага и даёт броню союзнику — это усиливает кора`);
-  else if(u.length)P(Math.min(.8,.35+.2*u.length),`Командная/спасающая польза: ${[...new Set(u)].slice(0,3).map(nm).join(', ')}`);
-  if(!hasG&&!hasS&&min>=24&&(pf.mag>=.55||pf.phys>=.55)){ /* советуем только при явном перекосе урона */
-   const heavy=!u.length;
-   if(pf.mag>=pf.phys){C(heavy?-.6:-.2,`Враг бьёт магией (${mg}%), а Glimmer Cape в билде нет`);N('Glimmer Cape',`Против ${mg}% магического урона Glimmer даёт кору и тебе магрезист плюс невидимость при фокусе — дешёвый способ пережить бурст.`)}
-   else{C(heavy?-.6:-.2,`Враг бьёт физикой (${ph}%), а Solar Crest в билде нет`);N('Solar Crest',`Против ${ph}% физического урона Solar Crest нужен ради кора: союзнику броня и уклонение, у врага минус брони — кор живёт дольше и убивает быстрее.`)}
+ /* 8. Blink Dagger — только героям, которым он нужен */
+ if(BLINK_H.has(hname)&&min>=20){
+  if(!anyOf(inv,BLINK)){C(-.6,`На ${hn(p)} нет Blink Dagger — без блинка герой хуже входит в драку и достаёт цель`);N('Blink Dagger',`Для ${hn(p)} блинк — стандартный способ дотянуться до цели и вовремя применить ключевые способности.`)}
+  else P(.3,`Блинк (${names(BLINK,inv)}) — основа входа в драку для ${hn(p)}`);
+ }
+
+ /* 9. Solar Crest — всегда этим героям */
+ if(SOLAR_H.has(hname)&&(!SOLAR_SUP_ONLY.has(hname)||sup)&&min>=22){
+  const ph=Math.round(pf.phys*100);
+  if(has('solar_crest'))P(.4,'Solar Crest — усиливает кора: броня и уклонение союзнику, минус брони врагу');
+  else{C(-.3,'Нет Solar Crest — а он нужен кору');N('Solar Crest',`Solar Crest полезен для кора: союзнику броня и уклонение, у врага минус брони — кор убивает быстрее и дольше живёт${ph>=50?` (особенно против ${ph}% физического урона)`:''}.`)}
+ }
+
+ /* 10. Spirit Vessel / Essence Distiller */
+ if(VESSEL_H.has(hname)&&min>=20){
+  if(anyOf(inv,VESSEL))P(.2,`${names(VESSEL,inv)} — режет лечение и сжигает HP цели`);
+  else{C(-.25,'Нет Spirit Vessel / Essence Distiller');N('Spirit Vessel / Essence Distiller','Дешёвая и сильная покупка: режет лечение и регенерацию, сжигает HP цели, помогает убивать танков и героев с лечением.')}
+ }
+
+ /* 11. саппорты: Force Staff, командный предмет (одно из двух), Glimmer */
+ if(sup&&min>=18){
+  let sp=false;const gp=(d,t)=>{sp=true;P(d,t)};
+  const mg=Math.round(pf.mag*100);
+  if(anyOf(inv,FORCE))gp(.3,`${names(FORCE,inv)} — мастхев саппорта: вытаскивает союзников и помогает самому выйти из драки`);
+  else{C(-.5,'Нет Force Staff — а это мастхев саппорта почти в каждой игре');N('Force Staff','Мастхев саппорта: вытаскивает союзников из-под фокуса, срывает инициацию и спасает самого; нужен почти в каждой игре.')}
+  if(TEAMITEM_H.has(hname)&&min>=22){
+   if(anyOf(inv,DRUMS)||anyOf(inv,MEK))gp(.3,`${names(DRUMS.concat(MEK),inv)} — командный предмет с аурой на всю команду`);
+   else if(!(TC.teamD&&TC.teamM)){
+    const wantMek=TC.teamD?true:TC.teamM?false:TC.atkCores<2;
+    if(wantMek){C(-.25,'Нет командного предмета (Mekansm → Guardian Greaves)');N('Mekansm (→ Guardian Greaves)','Хил и броня на всю команду в драке; особенно выручает, когда враг давит бурстом или в команде мало лечения.')}
+    else{C(-.25,'Нет командного предмета (Ancient Janggo → Boots of Bearing)');N('Ancient Janggo (→ Boots of Bearing)','Скорость и темп атаки всей команде; лучше всего работает, когда несколько героев бьют руками.')}
+   }
   }
+  if(!SOLAR_H.has(hname)&&pf.mag>=.55){
+   if(has('glimmer_cape'))gp(.4,`Glimmer Cape: против ${mg}% магического урона даёт союзнику магрезист и невидимость`);
+   else{C(-.3,`Враг бьёт магией (${mg}%), а Glimmer Cape в билде нет`);N('Glimmer Cape',`Против ${mg}% магического урона Glimmer даёт кору и тебе магрезист плюс невидимость при фокусе — дешёвый способ пережить бурст.`)}
+  }
+  const u=inv.main.concat(inv.bp).filter(k=>UTILITY.includes(k));
+  if(!sp&&u.length)P(Math.min(.5,.2+.15*u.length),`Командная/спасающая польза: ${[...new Set(u)].slice(0,3).map(nm).join(', ')}`);
  }
 
  /* итог */
  const scale=min<15?.5:min<22?.8:1;
  const raw=6+s*scale,score=cl(Math.round(raw),1,10);
- return{na:false,score,raw,pros,cons,need:need.filter((x,i,a)=>a.findIndex(y=>y.i===x.i)===i).slice(0,3)};
+ return{na:false,score,raw,pros,cons,need:need.filter((x,i,a)=>a.findIndex(y=>y.i===x.i)===i).sort((a,b)=>a.pr-b.pr).slice(0,4)};
 }
 
 /* ---------- сбор данных по матчу ---------- */
@@ -220,8 +263,10 @@ function evaluate(C){
   const teamHas=arr=>me.some(I=>!I.leaver&&anyOf(I.inv,arr));
   const holder=arr=>me.find(I=>!I.leaver&&anyOf(I.inv,arr));
   const recs=[];const TC={prof};
+   TC.teamD=teamHas(DRUMS);TC.teamM=teamHas(MEK);
+   TC.atkCores=me.filter(I=>!I.leaver&&I.pos<=3&&(heroData(I.p).roles||[]).includes('Carry')&&!SPELL_CARRIES.has(strip(heroData(I.p).name))&&heroData(I.p).primary_attr!=='int').length;
 
-  /* Pipe/Hood */
+  /* Pipe / Eternal Shroud */
   const mStr=cl((prof.mag-.45)/.3,0,1);
   const cStr=Math.max(cl((prof.phys-.5)/.3,0,1),prof.summ>=3?1:prof.summ===2?.75:prof.summ===1?.35:0);
   const crimWhy=prof.summ>=2?`${prof.summ} саммонеров/иллюзионистов врага (${prof.summoners.slice(0,3).join(', ')})`:`физического урона врага (${Math.round(prof.phys*100)}%)`;
@@ -231,14 +276,14 @@ function evaluate(C){
   const doPipe=()=>{
    if(mStr<.25)return;
    if(pipeHas){const h=holder(MAG_DEF);TC.pipe={slot:h.p.player_slot,have:true,str:mStr};recs.push({k:'ok',t:`<b>${esc(hn(h.p))}</b> собрал ${esc(names(MAG_DEF,h.inv))} — против ${Math.round(prof.mag*100)}% магического урона врага это правильно.`})}
-   else{const c=pickCandidate(me,{3:1,4:.25},used);if(c){used.push(c.p.player_slot);TC.pipe={slot:c.p.player_slot,have:false,str:mStr};
-    recs.push({k:'warn',t:`Враг бьёт в основном магией (<b>${Math.round(prof.mag*100)}%</b>), а Pipe/Hood/Eternal Shroud в команде нет. Выгоднее всех его было купить <b>${esc(hn(c.p))}</b> (${esc(c.p.personaname||'игрок')}): ${c.pos>=4?'аура на всю команду работает там, где он стоит рядом с союзниками':'он в центре драки, и аура накрывает всех'}.`})}}
+   else{const c=pickCandidate(me,{3:1,4:.9,5:.7,2:.4,1:.2},used,PIPE_CRIM_H);if(!c)recs.push({k:'',t:`Враг бьёт магией (${Math.round(prof.mag*100)}%), но в команде нет героя, которому Pipe подходит по роли, — совет по нему не даётся.`});if(c){used.push(c.p.player_slot);TC.pipe={slot:c.p.player_slot,have:false,str:mStr};
+    recs.push({k:'warn',t:`Враг бьёт в основном магией (<b>${Math.round(prof.mag*100)}%</b>), а Pipe / Eternal Shroud в команде нет. Выгоднее всех его было купить <b>${esc(hn(c.p))}</b> (${esc(c.p.personaname||'игрок')}): ${c.pos>=4?'аура на всю команду работает там, где он стоит рядом с союзниками':'он в центре драки, и аура накрывает всех'}.`})}}
   };
   const doCrim=()=>{
    if(cStr<.25)return;
    if(crimHas){const h=holder(crimList);TC.crim={slot:h.p.player_slot,have:true,str:cStr,why:crimWhy,list:crimList};recs.push({k:'ok',t:`<b>${esc(hn(h.p))}</b> собрал ${esc(names(crimList,h.inv))} — это к месту против ${esc(crimWhy)}.`})}
-   else{const c=pickCandidate(me,{3:1,4:.25},used);if(c){used.push(c.p.player_slot);TC.crim={slot:c.p.player_slot,have:false,str:cStr,why:crimWhy,list:crimList};
-    recs.push({k:'warn',t:`Против ${esc(crimWhy)} в команде нет Crimson Guard / Shiva's Guard. Выгоднее всех его было купить <b>${esc(hn(c.p))}</b> (${esc(c.p.personaname||'игрок')}).`})}}
+   else{const c=pickCandidate(me,{3:1,4:.9,5:.7,2:.4,1:.2},used,PIPE_CRIM_H);if(!c)recs.push({k:'',t:`Против ${esc(crimWhy)} нужна броня, но в команде нет героя, которому Crimson Guard подходит по роли, — совет по нему не даётся.`});if(c){used.push(c.p.player_slot);TC.crim={slot:c.p.player_slot,have:false,str:cStr,why:crimWhy,list:crimList};
+    recs.push({k:'warn',t:`Против ${esc(crimWhy)} в команде нет Crimson Guard. Выгоднее всех его было купить <b>${esc(hn(c.p))}</b> (${esc(c.p.personaname||'игрок')}).`})}}
   };
   if(pipeFirst){doPipe();doCrim()}else{doCrim();doPipe()}
   if(mStr<.25&&cStr<.25)recs.push({k:'',t:`Урон врага смешанный (магия ${Math.round(prof.mag*100)}% / физика ${Math.round(prof.phys*100)}%) — срочной нужды в Pipe или Crimson не было.`});
