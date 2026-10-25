@@ -1,4 +1,4 @@
-# Who Ruined v6.7
+# Who Ruined v6.8
 
 Match ID → OpenDota → role-aware match analysis → verdict.
 
@@ -53,3 +53,4 @@ Match ID → OpenDota → role-aware match analysis → verdict.
   - ВАЖНО: Лиону нужен заголовок `Access-Control-Allow-Origin: *` на папке `/ads/` (иначе виден только постер). Cloudflare Pages/Netlify — файл `_headers` уже в корне; GitHub Pages отдаёт его сам; nginx — блок `location ^~ /ads/` из `ads/Установка.txt`.
   - Локальная проверка: `python3 serve.py` → http://localhost:8080 (двойной клик по index.html не подходит — модели грузятся через fetch).
 - v6.7: по просьбе партнёра на оба баннера добавлена ссылка с UTM-меткой `https://collectorscache.ru/?utm_source=who_ruined&utm_medium=banner&utm_campaign=who_ruined&utm_content=skinspace_collectors`: кнопка «Открыть маркет» в ПК-баннере (`ads/lion-banner-cards/index.html`) и вся картинка мобильного баннера (`js/ads.js`, константа MARKET_URL). Файл index.html баннера изменён намеренно — его хеш в SHA256SUMS партнёра больше не совпадает.
+- v6.8: раскладка рекламы больше не зависит от кэша style.css: стили баннеров вынесены в inline <style id="adCss"> в <head> index.html; ко всем подключениям css/js добавлен ?v=6.8 (сброс кэша). Причина бага: при устаревшем style.css баннер вставал обычным блоком над логотипом.

@@ -359,17 +359,3 @@ h1.titleBanner img{width:min(100%,532px)}
 .wyTbl th{font-size:10px;letter-spacing:.8px;color:#8b93a4;text-transform:uppercase}.wyTbl td.g{color:#6ad39a;font-weight:800}.wyTbl td.r{color:#ff7a80;font-weight:800}
 .wyList{margin:0;padding-left:18px;display:grid;gap:5px;font-size:12px;line-height:1.5;color:#b7c0cf}.wyList.good li::marker{color:#6ad39a}
 @media(max-width:750px){.wySec .reasons{grid-template-columns:1fr}.wyLeg li{grid-template-columns:10px 1fr auto}.wyLeg small{grid-column:2/-1}.wyTop{flex-direction:column;align-items:flex-start}}
-
-/* ===== v6.6: реклама Skin Space × Collectors Cache ===== */
-.adSlot{display:none}
-.adNote{display:block;margin-top:6px}
-.adMobile{display:block;margin-top:14px;max-width:480px}
-.adMobile a{display:block;line-height:0;border-radius:12px;overflow:hidden}
-.adMobile img{display:block;width:100%;max-width:480px;height:auto;border:0}
-.adLion iframe{display:block;width:360px;height:490px;max-width:100%;border:0;border-radius:14px}
-@media(min-width:1180px){
- .app>header{display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:repeat(7,auto) 1fr;column-gap:28px}
- .app>header>*{grid-column:1}
- .app>header>.adLion{display:block;grid-column:2;grid-row:1/-1;align-self:start;margin-top:6px}
- .app>header>.adMobile{display:none}
-}

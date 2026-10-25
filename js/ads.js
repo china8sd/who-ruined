@@ -15,7 +15,7 @@ function label(){const s=document.createElement('span');s.className='adLabel adN
 function mountLion(el){
  if(!el||el.dataset.ready)return;el.dataset.ready='1';
  const f=document.createElement('iframe');
- f.src=BASE+'lion-banner-cards/index.html';
+ f.src=BASE+'lion-banner-cards/index.html?v=6.8';
  f.width='360';f.height='490';f.title='Skin Space и Collectors Cache — собери свой сет';
  f.setAttribute('sandbox','allow-scripts allow-popups allow-popups-to-escape-sandbox');
  f.setAttribute('referrerpolicy','no-referrer');

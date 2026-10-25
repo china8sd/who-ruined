@@ -4,7 +4,22 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Who Ruined — разбор поражения в Dota 2 по Match ID"><meta name="theme-color" content="#05070b">
 <title>Who Ruined — Dota 2 Match Analyzer</title>
-<link rel="stylesheet" href="css/style.css">
+<link rel="stylesheet" href="css/style.css?v=6.8">
+<style id="adCss">
+/* реклама Skin Space × Collectors Cache — стили здесь, чтобы раскладка не зависела от кэша style.css */
+.adSlot{display:none}
+.adNote{display:block;margin-top:6px}
+.adMobile{display:block;margin-top:14px;max-width:480px}
+.adMobile a{display:block;line-height:0;border-radius:12px;overflow:hidden}
+.adMobile img{display:block;width:100%;max-width:480px;height:auto;border:0}
+.adLion iframe{display:block;width:360px;height:490px;max-width:100%;border:0;border-radius:14px}
+@media(min-width:1180px){
+ .app>header{display:grid;grid-template-columns:minmax(0,1fr) 360px;grid-template-rows:repeat(7,auto) 1fr;column-gap:28px}
+ .app>header>*{grid-column:1}
+ .app>header>.adLion{display:block;grid-column:2;grid-row:1/-1;align-self:start;margin-top:6px}
+ .app>header>.adMobile{display:none}
+}
+</style>
 </head>
 <body>
 <div class="bg"></div>
@@ -68,10 +83,10 @@
 <div id="advModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="advTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="advTitle">Оправдать руинера?</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="advContent"></div></div></div>
 <div id="draftModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="draftTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="draftTitle">Чей драфт лучше?</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="draftBox"></div></div></div>
 <div id="buildModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="buildTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard bvCard"><div class="whyModalHead"><h2 id="buildTitle">Оценка билдов</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="buildBox"></div></div></div>
-<script src="js/app.js"></script>
-<script src="js/extras.js"></script>
-<script src="js/builds.js"></script>
-<script src="js/why.js"></script>
-<script src="js/ads.js"></script>
+<script src="js/app.js?v=6.8"></script>
+<script src="js/extras.js?v=6.8"></script>
+<script src="js/builds.js?v=6.8"></script>
+<script src="js/why.js?v=6.8"></script>
+<script src="js/ads.js?v=6.8"></script>
 </body>
 </html>
