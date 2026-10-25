@@ -1,0 +1,146 @@
+{
+  "capturedAtUtc": "2026-10-23T00:58:02.675332+00:00",
+  "apiResponseDate": "Fri, 23 Oct 2026 00:58:04 GMT",
+  "showroomUrl": "https://collectorscache.ru/viewer/showroom?hero=lion&set=cannonroar-confessor&items=35387",
+  "apiUrl": "https://collectorscache.ru/viewer/api/market/hero/lion?currency=RUB",
+  "priceMeaning": "Displayed sale price in Collectors Cache showroom, priceRub field; Steam comparison prices are not used.",
+  "items": [
+    {
+      "id": "25681",
+      "name": "Cannonroar Confessor - Back",
+      "slot": "back",
+      "available": true,
+      "priceRub": 30.71,
+      "currency": "RUB",
+      "priceField": "priceRub",
+      "priceSource": "https://collectorscache.ru/viewer/api/market/hero/lion?currency=RUB",
+      "marketHashName": "Cannonroar Confessor - Back",
+      "steamPriceRubReferenceOnly": 35.07,
+      "rarity": "Mythical",
+      "imageSource": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Back",
+      "imageResolvedUrl": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Back",
+      "imageSourceContentType": "image/png",
+      "imageSourceBytes": 48644,
+      "imageSourceSize": [
+        256,
+        170
+      ],
+      "image": "items/25681.webp",
+      "imageBytes": 3348,
+      "imageSize": [
+        160,
+        120
+      ]
+    },
+    {
+      "id": "25700",
+      "name": "Cannonroar Confessor - Head",
+      "slot": "head",
+      "available": true,
+      "priceRub": 14.46,
+      "currency": "RUB",
+      "priceField": "priceRub",
+      "priceSource": "https://collectorscache.ru/viewer/api/market/hero/lion?currency=RUB",
+      "marketHashName": "Cannonroar Confessor - Head",
+      "steamPriceRubReferenceOnly": 19.87,
+      "rarity": "Mythical",
+      "imageSource": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Head",
+      "imageResolvedUrl": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Head",
+      "imageSourceContentType": "image/png",
+      "imageSourceBytes": 36044,
+      "imageSourceSize": [
+        256,
+        170
+      ],
+      "image": "items/25700.webp",
+      "imageBytes": 2666,
+      "imageSize": [
+        160,
+        120
+      ]
+    },
+    {
+      "id": "25701",
+      "name": "Cannonroar Confessor - Shoulder",
+      "slot": "armor",
+      "available": true,
+      "priceRub": 97.57,
+      "currency": "RUB",
+      "priceField": "priceRub",
+      "priceSource": "https://collectorscache.ru/viewer/api/market/hero/lion?currency=RUB",
+      "marketHashName": "Cannonroar Confessor - Shoulder",
+      "steamPriceRubReferenceOnly": 135.39,
+      "rarity": "Mythical",
+      "imageSource": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Shoulder",
+      "imageResolvedUrl": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Shoulder",
+      "imageSourceContentType": "image/png",
+      "imageSourceBytes": 54284,
+      "imageSourceSize": [
+        256,
+        170
+      ],
+      "image": "items/25701.webp",
+      "imageBytes": 3774,
+      "imageSize": [
+        160,
+        120
+      ]
+    },
+    {
+      "id": "25703",
+      "name": "Cannonroar Confessor - Weapon",
+      "slot": "weapon",
+      "available": true,
+      "priceRub": 205.98,
+      "currency": "RUB",
+      "priceField": "priceRub",
+      "priceSource": "https://collectorscache.ru/viewer/api/market/hero/lion?currency=RUB",
+      "marketHashName": "Cannonroar Confessor - Weapon",
+      "steamPriceRubReferenceOnly": 251.21,
+      "rarity": "Immortal",
+      "imageSource": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Weapon",
+      "imageResolvedUrl": "https://collectorscache.ru/viewer/api/item-images/Cannonroar%20Confessor%20-%20Weapon",
+      "imageSourceContentType": "image/png",
+      "imageSourceBytes": 43217,
+      "imageSourceSize": [
+        256,
+        170
+      ],
+      "image": "items/25703.webp",
+      "imageBytes": 2960,
+      "imageSize": [
+        160,
+        120
+      ]
+    },
+    {
+      "id": "35387",
+      "name": "Hell-Spar Anathema of the Crimson Witness",
+      "slot": "arms",
+      "available": true,
+      "priceRub": 14253.26,
+      "currency": "RUB",
+      "priceField": "priceRub",
+      "priceSource": "https://collectorscache.ru/viewer/api/market/hero/lion?currency=RUB",
+      "marketHashName": "Hell-Spar Anathema of the Crimson Witness",
+      "steamPriceRubReferenceOnly": 16058.41,
+      "rarity": "Immortal",
+      "imageSource": "https://collectorscache.ru/viewer/api/item-images/Hell-Spar%20Anathema%20of%20the%20Crimson%20Witness",
+      "imageResolvedUrl": "https://collectorscache.ru/viewer/api/item-images/Hell-Spar%20Anathema%20of%20the%20Crimson%20Witness",
+      "imageSourceContentType": "image/png",
+      "imageSourceBytes": 55582,
+      "imageSourceSize": [
+        256,
+        170
+      ],
+      "image": "items/35387.webp",
+      "imageBytes": 4108,
+      "imageSize": [
+        160,
+        120
+      ]
+    }
+  ],
+  "totalPriceRub": 14601.98,
+  "totalImageBytes": 16856
+}

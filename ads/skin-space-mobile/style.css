@@ -1,0 +1,18 @@
+@font-face{font-family:BannerAnton;src:url('assets/Anton-Mobile.woff2') format('woff2');font-style:normal;font-weight:400;font-display:swap}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;background:transparent}body{font-family:Arial,Helvetica,sans-serif}
+.banner{display:block;position:relative;isolation:isolate;width:100%;max-width:480px;height:105px;overflow:hidden;border:1px solid #7c91ad91;border-radius:11px;color:#fff;text-decoration:none;background:radial-gradient(ellipse at 5% 15%,#214659a8,transparent 58%),radial-gradient(ellipse at 95% 90%,#68503e70,transparent 50%),linear-gradient(115deg,#101e30,#151626 58%,#142337);box-shadow:inset 0 1px 0 #ffffff24;touch-action:manipulation;-webkit-tap-highlight-color:#d8c18a20}
+.banner::after{content:"";position:absolute;left:28%;right:28%;bottom:0;height:1px;background:linear-gradient(90deg,transparent,#f5d8a3,transparent);opacity:.8}
+.space{position:absolute;inset:0;overflow:hidden;pointer-events:none;background-image:radial-gradient(1px 1px at 8% 28%,#d6f0ff 90%,transparent),radial-gradient(1px 1px at 36% 10%,#ceebf0 90%,transparent),radial-gradient(1px 1px at 91% 24%,#d9e2ff 90%,transparent),radial-gradient(1px 1px at 76% 83%,#ffe5ba 90%,transparent),radial-gradient(.7px .7px at 16% 88%,#c7eaf4 90%,transparent),radial-gradient(.7px .7px at 57% 39%,#cee4f8 90%,transparent)}
+.comet{position:absolute;display:block;pointer-events:none;filter:drop-shadow(0 0 8px #a7dbff70)}
+.comet-right{width:133px;height:133px;right:-14px;top:-31px;opacity:.22;transform:rotate(6deg)}
+.comet-left{width:80px;height:80px;left:-31px;top:39px;opacity:.32;transform:rotate(-6deg)}
+.comet-small{width:35px;height:35px;left:39%;top:-11px;opacity:.35}
+.streak{position:absolute;width:80px;height:1px;background:linear-gradient(90deg,transparent,#bde8ffb0);transform:rotate(-42deg);opacity:.36}.streak-one{right:-12px;top:73px}.streak-two{left:-25px;top:18px;width:50px;opacity:.24}
+.brands{position:relative;display:flex;align-items:center;justify-content:center;gap:8px;height:44px;margin:7px 12px 0;mix-blend-mode:lighten}
+.skin{display:block;width:112px;height:auto;flex:none;filter:drop-shadow(0 1px 3px #0009)}
+.ampersand{width:16px;flex:none;text-align:center;font:400 21px/1 Georgia,serif;color:#efcfa0}
+.collector{display:block;width:150px;height:44px;object-fit:cover;object-position:center;flex:none;mix-blend-mode:lighten}
+h1{position:relative;margin:8px 8px 0;text-align:center;white-space:nowrap;font:400 clamp(18px,6.4vw,26px)/1.15 BannerAnton,Impact,sans-serif;letter-spacing:.005em;text-transform:uppercase;text-shadow:0 2px 5px #060b18,0 0 14px #080e1d}
+h1 span{color:#ffdda1}
+.banner:focus-visible{outline:2px solid #ffe7b5;outline-offset:-4px}
+@media(max-width:339px){.brands{gap:6px}.skin{width:100px}.collector{width:135px}}

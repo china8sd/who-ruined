@@ -1,0 +1,27 @@
+.with-items .stage{transform:scale(1.04);transform-origin:50% 54%}
+.with-items .rotate-hint{display:flex;align-items:center;gap:6px;min-height:20px;font-size:10px;line-height:14px;color:#d9cce9}
+.rotate-hint svg{display:block;flex:none;width:25px;height:24px;color:#ecd3a9;animation:drag-hint 1.6s ease-in-out 3}
+.with-items .hero-label{width:100%;gap:2px;align-items:center;text-align:center}
+.with-items .scene-actions{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+.with-items .orbit-mark{display:none}
+.is-fallback .rotate-hint{display:none}
+@keyframes drag-hint{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+.item-cards{position:absolute;inset:0;z-index:3;pointer-events:none}
+.item-card{position:absolute;width:83px;height:72px;margin:0;border:1px solid #bba5db35;border-radius:8px;background:linear-gradient(145deg,#241f32f2,#11131bed);box-shadow:0 5px 15px #0005,inset 0 1px 0 #ffffff08;overflow:hidden;text-align:center;transform:scale(.72);transform-origin:left center;transition:transform .22s cubic-bezier(.2,.7,.2,1),border-color .22s,box-shadow .22s;user-select:none}
+.item-card.is-expanded,.item-card:focus-visible{transform:scale(1);z-index:5;border-color:#d7c3ef99;box-shadow:0 8px 22px #0009,inset 0 1px 0 #ffffff15}
+.item-card:focus-visible{outline:1px solid #f5dca8;outline-offset:3px}
+.item-arms,.item-weapon{transform-origin:right center}
+.item-card img{display:block;width:76px;height:40px;margin:0 auto;object-fit:contain;filter:drop-shadow(0 2px 4px #0007)}
+.item-card figcaption{display:flex;flex-direction:column;align-items:center;gap:3px;padding:0 2px}
+.item-name{display:block;max-width:100%;font-size:8px;line-height:9px;color:#b9b0c7;white-space:nowrap}
+.item-card strong{font-size:12px;line-height:13px;letter-spacing:.01em;font-weight:700;color:#f8d79b;font-variant-numeric:tabular-nums;white-space:nowrap}
+.item-card::after{content:"";position:absolute;bottom:0;left:15px;right:15px;height:1px;background:linear-gradient(90deg,transparent,#c2a8e650,transparent)}
+.item-head{left:11px;top:143px}
+.item-armor{left:8px;top:230px}
+.item-back{left:13px;top:317px}
+.item-arms{right:10px;top:171px;height:85px;border-color:#d9b06a60;background:linear-gradient(145deg,#312534f5,#17141eee)}
+.item-arms img{height:48px;width:80px}
+.item-arms .item-name{font-size:7.5px;color:#d5bc9b}
+.item-arms strong{font-size:11px}
+.item-arms::after{background:linear-gradient(90deg,transparent,#e8b968a0,transparent)}
+.item-weapon{right:10px;top:298px}

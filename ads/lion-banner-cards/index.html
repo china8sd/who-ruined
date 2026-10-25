@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'; object-src 'none'; frame-src 'none'; worker-src 'none'">
+  <meta name="referrer" content="no-referrer">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Skin Space &amp; Collectors Cache — собери свой сет за лучший прайс</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="cards.css">
+</head>
+<body>
+  <main class="ad with-items is-fallback" aria-label="Реклама Skin Space и Collectors Cache — собери свой сет за лучший прайс">
+    <div class="aura" aria-hidden="true"></div>
+    <header class="heading">
+      <div class="brand-pair" role="img" aria-label="Skin Space и Collectors Cache">
+        <img class="skin-brand" src="brand/skinspace-logo.png" alt="" width="298" height="96" aria-hidden="true">
+        <span class="brand-ampersand" aria-hidden="true">&amp;</span>
+        <img class="collector-brand" src="brand/collectorscache-logo.webp" alt="" width="384" height="192" aria-hidden="true">
+      </div>
+      <h1>Собери свой сет<span class="headline-offer">за лучший прайс</span></h1>
+    </header>
+    <div id="stage" class="stage" tabindex="0" role="group" title="Зажмите и перетащите, чтобы вращать" aria-label="Лион в 3D. Перетаскивайте для вращения; стрелки влево и вправо меняют ракурс.">
+      <img class="poster" src="assets/poster.webp" alt="Лион в сете Cannonroar Confessor" fetchpriority="high">
+      <canvas id="scene" aria-hidden="true"></canvas>
+      <div class="loading" role="status"><span>Готовим твой образ</span><i></i></div>
+    </div>
+    <aside class="item-cards" aria-label="Надетые предметы и снимок цен от 23 октября 2026 года">
+      <figure class="item-card item-head" data-item-id="25700" aria-label="Cannonroar Confessor - Head, 14,46 ₽">
+        <img src="items/25700.webp" alt="" width="160" height="120" decoding="async">
+        <figcaption><span class="item-name">Шлем</span><strong>14,46 ₽</strong></figcaption>
+      </figure>
+      <figure class="item-card item-armor" data-item-id="25701" aria-label="Cannonroar Confessor - Shoulder, 97,57 ₽">
+        <img src="items/25701.webp" alt="" width="160" height="120" decoding="async">
+        <figcaption><span class="item-name">Броня</span><strong>97,57 ₽</strong></figcaption>
+      </figure>
+      <figure class="item-card item-back" data-item-id="25681" aria-label="Cannonroar Confessor - Back, 30,71 ₽">
+        <img src="items/25681.webp" alt="" width="160" height="120" decoding="async">
+        <figcaption><span class="item-name">Спина</span><strong>30,71 ₽</strong></figcaption>
+      </figure>
+      <figure class="item-card item-arms" data-item-id="35387" aria-label="Hell-Spar Anathema of the Crimson Witness, 14 253,26 ₽">
+        <img src="items/35387.webp" alt="" width="160" height="120" decoding="async">
+        <figcaption><span class="item-name">Crimson Witness</span><strong>14 253,26 ₽</strong></figcaption>
+      </figure>
+      <figure class="item-card item-weapon" data-item-id="25703" aria-label="Cannonroar Confessor - Weapon, 205,98 ₽">
+        <img src="items/25703.webp" alt="" width="160" height="120" decoding="async">
+        <figcaption><span class="item-name">Оружие</span><strong>205,98 ₽</strong></figcaption>
+      </figure>
+    </aside>
+    <div class="scene-meta">
+      <span class="hero-label"><b>LION</b><span class="rotate-hint"><svg viewBox="0 0 32 28" fill="none" aria-hidden="true"><path d="M5 4h22M8 1 5 4l3 3m16-6 3 3-3 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/><g transform="translate(3 7) scale(.72)"><path d="M11 13V5a2 2 0 0 1 4 0v7m0-2a2 2 0 0 1 4 0v3m0-1a2 2 0 0 1 4 0v4c0 4-2 7-6 7h-1c-2 0-4-1-5-3l-4-5a2 2 0 0 1 3-2l1 1" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></g></svg>Тяните, чтобы вращать</span></span>
+      <div class="scene-actions">
+        <span class="orbit-mark" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M20 9c-1.5-3.2-6.8-4.9-11.5-3.4M4 15c1.5 3.2 6.8 4.9 11.5 3.4M20 5v4h-4M4 19v-4h4" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+        <button id="motion" class="motion" type="button" aria-label="Приостановить анимацию" title="Приостановить анимацию"><svg class="pause-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="M6 5v10M14 5v10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg><svg class="play-icon" viewBox="0 0 20 20" aria-hidden="true"><path d="m7 4 9 6-9 6Z" fill="currentColor"/></svg></button>
+      </div>
+    </div>
+    <a class="cta" href="https://collectorscache.ru/?utm_source=who_ruined&amp;utm_medium=banner&amp;utm_campaign=who_ruined&amp;utm_content=skinspace_collectors" target="_blank" rel="noopener noreferrer"><span>Открыть маркет</span><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12h15m-5-5 5 5-5 5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+  </main>
+  <script src="cards.js"></script>
+  <script src="bootstrap.js"></script>
+</body>
+</html>

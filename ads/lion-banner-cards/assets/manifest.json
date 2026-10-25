@@ -1,0 +1,573 @@
+{
+  "hero": "lion",
+  "set": "cannonroar-confessor",
+  "overrideItems": [
+    "35387"
+  ],
+  "animation": "taunt_hell_and_back_effigy",
+  "animationDurationSeconds": 5.266666889190674,
+  "base": "assets/lion.glb",
+  "wearables": [
+    {
+      "src": "assets/lion_dungeon_poacher_back.glb",
+      "slot": "back",
+      "name": "Cannonroar Confessor - Back",
+      "id": "25681"
+    },
+    {
+      "src": "assets/lion_dungeon_poacher_wearable.glb",
+      "slot": "head",
+      "name": "Cannonroar Confessor - Head",
+      "id": "25700"
+    },
+    {
+      "src": "assets/lion_dungeon_poacher_shoulder.glb",
+      "slot": "armor",
+      "name": "Cannonroar Confessor - Shoulder",
+      "id": "25701"
+    },
+    {
+      "src": "assets/lion_dungeon_poacher_weapon.glb",
+      "slot": "weapon",
+      "name": "Cannonroar Confessor - Weapon",
+      "id": "25703"
+    },
+    {
+      "src": "assets/lion_ti8_arm_alt.glb",
+      "slot": "arms",
+      "name": "Hell-Spar Anathema of the Crimson Witness",
+      "id": "35387"
+    }
+  ],
+  "models": [
+    {
+      "dir": "base",
+      "stem": "lion",
+      "name": "Lion",
+      "model": "heroes/lion/lion",
+      "clips": [
+        "taunt_hell_and_back_effigy"
+      ],
+      "src": "assets/lion.glb",
+      "originalUrl": "https://collectorscache.ru/api/models/heroes/lion/lion.glb",
+      "beforeBytes": 12373340,
+      "afterBytes": 755964,
+      "animationsBefore": 83,
+      "animations": [
+        "taunt_hell_and_back_effigy"
+      ],
+      "textureBytesBefore": 901519,
+      "vertices": 2409,
+      "sparseMorphTargets": 45
+    },
+    {
+      "id": "25681",
+      "slot": "back",
+      "dir": "lion_dungeon_poacher_back",
+      "stem": "lion_dungeon_poacher_back",
+      "name": "Cannonroar Confessor - Back",
+      "clips": [],
+      "src": "assets/lion_dungeon_poacher_back.glb",
+      "originalUrl": "https://collectorscache.ru/api/models/items/lion/lion_dungeon_poacher_back/lion_dungeon_poacher_back.glb",
+      "beforeBytes": 185584,
+      "afterBytes": 183928,
+      "animationsBefore": 0,
+      "animations": [],
+      "textureBytesBefore": 815081,
+      "vertices": 1993,
+      "sparseMorphTargets": 0
+    },
+    {
+      "id": "25700",
+      "slot": "head",
+      "dir": "lion_dungeon_poacher_wearable",
+      "stem": "lion_dungeon_poacher_wearable",
+      "name": "Cannonroar Confessor - Head",
+      "clips": [],
+      "src": "assets/lion_dungeon_poacher_wearable.glb",
+      "originalUrl": "https://collectorscache.ru/api/models/items/lion/lion_dungeon_poacher_wearable/lion_dungeon_poacher_wearable.glb",
+      "beforeBytes": 1292504,
+      "afterBytes": 403756,
+      "animationsBefore": 16,
+      "animations": [],
+      "textureBytesBefore": 752464,
+      "vertices": 1361,
+      "sparseMorphTargets": 44
+    },
+    {
+      "id": "25701",
+      "slot": "armor",
+      "dir": "lion_dungeon_poacher_shoulder",
+      "stem": "lion_dungeon_poacher_shoulder",
+      "name": "Cannonroar Confessor - Shoulder",
+      "clips": [],
+      "src": "assets/lion_dungeon_poacher_shoulder.glb",
+      "originalUrl": "https://collectorscache.ru/api/models/items/lion/lion_dungeon_poacher_shoulder/lion_dungeon_poacher_shoulder.glb",
+      "beforeBytes": 295148,
+      "afterBytes": 201152,
+      "animationsBefore": 1,
+      "animations": [],
+      "textureBytesBefore": 606307,
+      "vertices": 2123,
+      "sparseMorphTargets": 0
+    },
+    {
+      "id": "25703",
+      "slot": "weapon",
+      "dir": "lion_dungeon_poacher_weapon",
+      "stem": "lion_dungeon_poacher_weapon",
+      "name": "Cannonroar Confessor - Weapon",
+      "clips": [],
+      "src": "assets/lion_dungeon_poacher_weapon.glb",
+      "originalUrl": "https://collectorscache.ru/api/models/items/lion/lion_dungeon_poacher_weapon/lion_dungeon_poacher_weapon.glb",
+      "beforeBytes": 113996,
+      "afterBytes": 112332,
+      "animationsBefore": 0,
+      "animations": [],
+      "textureBytesBefore": 173634,
+      "vertices": 1243,
+      "sparseMorphTargets": 0
+    },
+    {
+      "id": "35387",
+      "slot": "arms",
+      "dir": "lion_ti8_arm",
+      "stem": "lion_ti8_arm_alt",
+      "name": "Hell-Spar Anathema of the Crimson Witness",
+      "clips": [],
+      "src": "assets/lion_ti8_arm_alt.glb",
+      "originalUrl": "https://collectorscache.ru/api/models/items/lion/lion_ti8_arm/lion_ti8_arm_alt.glb",
+      "beforeBytes": 444584,
+      "afterBytes": 320176,
+      "animationsBefore": 1,
+      "animations": [],
+      "textureBytesBefore": 907280,
+      "vertices": 9768,
+      "sparseMorphTargets": 0
+    }
+  ],
+  "textures": [
+    {
+      "file": "lion_body_color_psd_88b753c1.webp",
+      "sourceFile": "lion_body_color_psd_88b753c1.png",
+      "beforeBytes": 278893,
+      "afterBytes": 43482,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "4c0b5d961e52fff5ec19ff037ab29038a92be1d7546980f5e157362ec44ccfea"
+    },
+    {
+      "file": "lion_body_detailmask_tga_4fd7dc31.webp",
+      "sourceFile": "lion_body_detailmask_tga_4fd7dc31.png",
+      "beforeBytes": 6902,
+      "afterBytes": 2518,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "7daf380fb0817c33117a7be56de7a1865038bc2ac3da16f3efae10887eb9d393"
+    },
+    {
+      "file": "lion_body_specmask_tga_e77ad8f6.webp",
+      "sourceFile": "lion_body_specmask_tga_e77ad8f6.png",
+      "beforeBytes": 196913,
+      "afterBytes": 33920,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "92c4327608f7c2f7bf831c92acdaf54dc716e94b697cd83f4752ef40562f3874"
+    },
+    {
+      "file": "lion_body_normals_normal_psd_b743cee3.webp",
+      "sourceFile": "lion_body_normals_normal_psd_b743cee3.png",
+      "beforeBytes": 418811,
+      "afterBytes": 1500,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "dd0ec7c6f50f12904dfea987d4321cbc3503317127fbf88a760244d7ca4c0a94"
+    },
+    {
+      "file": "lion_dungeon_poacher_back_color_tga_b9f548b4.webp",
+      "sourceFile": "lion_dungeon_poacher_back_color_tga_b9f548b4.png",
+      "beforeBytes": 221832,
+      "afterBytes": 34928,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "6f528bccdf36169b1c4031590422c10dadead7ebd4e489b41b2911b0e3926d70"
+    },
+    {
+      "file": "lion_dungeon_poacher_back_metalnessmask_tga_8da8ebd2.webp",
+      "sourceFile": "lion_dungeon_poacher_back_metalnessmask_tga_8da8ebd2.png",
+      "beforeBytes": 27314,
+      "afterBytes": 1952,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "0dfae4f6ee7cbfff0299422750ee2c464210fb8db7e16511e4e4faa1f296cc12"
+    },
+    {
+      "file": "lion_dungeon_poacher_back_specmask_tga_707a7849.webp",
+      "sourceFile": "lion_dungeon_poacher_back_specmask_tga_707a7849.png",
+      "beforeBytes": 145683,
+      "afterBytes": 54742,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "be581fa9911ac5be0c79ac3a265dd08b29a3b5b084d0f883ecbe0e06062c55e6"
+    },
+    {
+      "file": "lion_dungeon_poacher_back_normal_tga_51076f4d.webp",
+      "sourceFile": "lion_dungeon_poacher_back_normal_tga_51076f4d.png",
+      "beforeBytes": 420252,
+      "afterBytes": 1616,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "9b92808c8fc86fe8b33e61a89f6da7aa8d2a8afdd27350b179332bb0f5753ca8"
+    },
+    {
+      "file": "lion_dungeon_poacher_wearable_color_tga_394528fd.webp",
+      "sourceFile": "lion_dungeon_poacher_wearable_color_tga_394528fd.png",
+      "beforeBytes": 217753,
+      "afterBytes": 37976,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "0fa1a4b88763aa5a7736a4c8026028cd59f919beff70e6a412635663b76c0e17"
+    },
+    {
+      "file": "lion_dungeon_poacher_wearable_detailmask_tga_f48617.webp",
+      "sourceFile": "lion_dungeon_poacher_wearable_detailmask_tga_f48617.png",
+      "beforeBytes": 23599,
+      "afterBytes": 2730,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "8cc82506a427cd50d3f5ce26a80aedef6bd559cf9b0898d5a10eaa1cbf286428"
+    },
+    {
+      "file": "lion_dungeon_poacher_wearable_specmask_tga_26f7e292.webp",
+      "sourceFile": "lion_dungeon_poacher_wearable_specmask_tga_26f7e292.png",
+      "beforeBytes": 125240,
+      "afterBytes": 40694,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "fa1d5200e241ef35a77b4e371665d8786453e3c069432f9f120f6d2b1fe272b4"
+    },
+    {
+      "file": "lion_dungeon_poacher_wearable_normal_tga_2cd4f194.webp",
+      "sourceFile": "lion_dungeon_poacher_wearable_normal_tga_2cd4f194.png",
+      "beforeBytes": 385872,
+      "afterBytes": 1688,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "178b0317e055140b2a33c2af8ed3aed91e20ce1d9aab4f5e36622f3155be4464"
+    },
+    {
+      "file": "lion_dungeon_poacher_shoulder_color_tga_95515548.webp",
+      "sourceFile": "lion_dungeon_poacher_shoulder_color_tga_95515548.png",
+      "beforeBytes": 172017,
+      "afterBytes": 28652,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "ae72750dc2e74fb8ad5fc1ed834a51771ab9a44b6d5064cac3cd7ae8a0dbf7e8"
+    },
+    {
+      "file": "lion_dungeon_poacher_shoulder_metalnessmask_tga_e3ba547b.webp",
+      "sourceFile": "lion_dungeon_poacher_shoulder_metalnessmask_tga_e3ba547b.png",
+      "beforeBytes": 55672,
+      "afterBytes": 28036,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "42f42a745f1d7f8c526b8a896da26fb2ebc951395aa9af1d99c3c03c2922a919"
+    },
+    {
+      "file": "lion_dungeon_poacher_shoulder_specmask_tga_7fc702c2.webp",
+      "sourceFile": "lion_dungeon_poacher_shoulder_specmask_tga_7fc702c2.png",
+      "beforeBytes": 84795,
+      "afterBytes": 26834,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "b83f083fa47a8c5350aff7626b09e0844e55a10e9d926a9a3426e1ab85c49ff4"
+    },
+    {
+      "file": "lion_dungeon_poacher_shoulder_normal_tga_6a94389.webp",
+      "sourceFile": "lion_dungeon_poacher_shoulder_normal_tga_6a94389.png",
+      "beforeBytes": 293823,
+      "afterBytes": 1422,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "d32639dcc0cbea0d922fe495ff91ae15c398f2a76b9e7b9c34c17a94376f62c9"
+    },
+    {
+      "file": "lion_dungeon_poacher_weapon_color_tga_44c028e4.webp",
+      "sourceFile": "lion_dungeon_poacher_weapon_color_tga_44c028e4.png",
+      "beforeBytes": 52184,
+      "afterBytes": 7592,
+      "width": 256,
+      "height": 256,
+      "format": "webp",
+      "sha256": "0b8e2f8317e2f9efd4f2aaf3543b88a9ac2c6194e22b355c3cf2038f6b91a549"
+    },
+    {
+      "file": "lion_dungeon_poacher_weapon_metalnessmask_tga_2f2990fb.webp",
+      "sourceFile": "lion_dungeon_poacher_weapon_metalnessmask_tga_2f2990fb.png",
+      "beforeBytes": 21615,
+      "afterBytes": 10816,
+      "width": 256,
+      "height": 256,
+      "format": "webp",
+      "sha256": "7bab7cb2066d8c746a8c3cf7f30694f1aa91b8b33e659ad5c5e6c471d5728e5c"
+    },
+    {
+      "file": "lion_dungeon_poacher_weapon_specmask_tga_1453d074.webp",
+      "sourceFile": "lion_dungeon_poacher_weapon_specmask_tga_1453d074.png",
+      "beforeBytes": 27079,
+      "afterBytes": 11642,
+      "width": 256,
+      "height": 256,
+      "format": "webp",
+      "sha256": "28e7f5ec7ecd1cbce2c103c920cf2d0598f757b54258492c366938f6d8210abd"
+    },
+    {
+      "file": "lion_dungeon_poacher_weapon_normal_tga_aa841ad.webp",
+      "sourceFile": "lion_dungeon_poacher_weapon_normal_tga_aa841ad.png",
+      "beforeBytes": 72756,
+      "afterBytes": 536,
+      "width": 256,
+      "height": 256,
+      "format": "webp",
+      "sha256": "decb0e955614bc8d4511d11b18a2d54ae3ca3329609f5b9ce5c3db391ee49988"
+    },
+    {
+      "file": "lion_ti8_arm_detailmask_psd_89a2f1d9.webp",
+      "sourceFile": "lion_ti8_arm_detailmask_psd_89a2f1d9.png",
+      "beforeBytes": 172197,
+      "afterBytes": 1934,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "387b93fdc75cbd39854d7d4f14c85e66fbfa83049c3ac2407329436abdb4e6fc"
+    },
+    {
+      "file": "lion_ti8_arm_alt_color_psd_87eb93f1.webp",
+      "sourceFile": "lion_ti8_arm_alt_color_psd_87eb93f1.png",
+      "beforeBytes": 231977,
+      "afterBytes": 33072,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "7e665aad9872f6605f99fa0e8d3ea08140b5103981a9c3dcbaa3fa0f43138225"
+    },
+    {
+      "file": "lion_ti8_arm_specmask_psd_313dda67.webp",
+      "sourceFile": "lion_ti8_arm_specmask_psd_313dda67.png",
+      "beforeBytes": 74600,
+      "afterBytes": 20492,
+      "width": 256,
+      "height": 256,
+      "format": "webp",
+      "sha256": "f3bb46c0d497e4e56c92f0b66f0c479c66b36cad5bec97cf3bc4deea12cb8425"
+    },
+    {
+      "file": "lion_ti8_arm_normal_psd_3e28fa10.webp",
+      "sourceFile": "lion_ti8_arm_normal_psd_3e28fa10.png",
+      "beforeBytes": 396068,
+      "afterBytes": 1648,
+      "width": 512,
+      "height": 512,
+      "format": "webp",
+      "sha256": "fefb3481c409bac75874275f761c39aab2609992d81800c9c05969354465c0f0"
+    },
+    {
+      "file": "lion_ti8_arm_glow_vmat_g_tcolor_5497dbd6.webp",
+      "sourceFile": "lion_ti8_arm_glow_vmat_g_tcolor_5497dbd6.png",
+      "beforeBytes": 94,
+      "afterBytes": 70,
+      "width": 4,
+      "height": 4,
+      "format": "webp",
+      "sha256": "22a48564997ebd459eef1a1b65658918cedc8f370a18157d67515355ab56374a"
+    },
+    {
+      "file": "lion_ti8_arm_glow_vmat_g_tmasks1_7a9bda4c.webp",
+      "sourceFile": "lion_ti8_arm_glow_vmat_g_tmasks1_7a9bda4c.png",
+      "beforeBytes": 106,
+      "afterBytes": 104,
+      "width": 16,
+      "height": 16,
+      "format": "webp",
+      "sha256": "cc151f2aa2996fa8ed38589fb435cac1d9a60a5ae756df1f666fba75b1a0757f"
+    },
+    {
+      "file": "default_normal_tga_7652cb.webp",
+      "sourceFile": "default_normal_tga_7652cb.png",
+      "beforeBytes": 93,
+      "afterBytes": 98,
+      "width": 4,
+      "height": 4,
+      "format": "webp",
+      "sha256": "77f6666425f52dbbf252058770e2aef9ec111e5bb55e71aa3bd3d332481cba6a"
+    },
+    {
+      "file": "lion_ti8_arm__shards_detailmask_psd_1520120e.webp",
+      "sourceFile": "lion_ti8_arm__shards_detailmask_psd_1520120e.png",
+      "beforeBytes": 12210,
+      "afterBytes": 254,
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "sha256": "c118aa68dd96f192028fc4e997b6a2ed779cb752ca7ba44347d9fc59b943ffdb"
+    },
+    {
+      "file": "lion_ti8_arm_shards_color_psd_863bb01f.webp",
+      "sourceFile": "lion_ti8_arm_shards_color_psd_863bb01f.png",
+      "beforeBytes": 9384,
+      "afterBytes": 2842,
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "sha256": "1f3eccb4b2eff90afb1b69aa1947cf4b88bca5ec2e4ff0c78e5be3897d13dae5"
+    },
+    {
+      "file": "lion_ti8_arm_shards_specmask_psd_5281e0d5.webp",
+      "sourceFile": "lion_ti8_arm_shards_specmask_psd_5281e0d5.png",
+      "beforeBytes": 10458,
+      "afterBytes": 2860,
+      "width": 128,
+      "height": 128,
+      "format": "webp",
+      "sha256": "79cfc2e9f2b804e7de5aa4fc20770cedd5aeebbb4b8a0fb4027445642f03c995"
+    }
+  ],
+  "sidecars": [
+    {
+      "file": "lion.cloth.json",
+      "beforeBytes": 161593,
+      "afterBytes": 89668
+    },
+    {
+      "file": "lion.face.json",
+      "beforeBytes": 11150,
+      "afterBytes": 10619
+    },
+    {
+      "file": "lion.attach.json",
+      "beforeBytes": 952,
+      "afterBytes": 844
+    },
+    {
+      "file": "lion_dungeon_poacher_back.cloth.json",
+      "beforeBytes": 44671,
+      "afterBytes": 24822
+    },
+    {
+      "file": "lion_dungeon_poacher_wearable.cloth.json",
+      "beforeBytes": 14452,
+      "afterBytes": 8105
+    },
+    {
+      "file": "lion_dungeon_poacher_wearable.face.json",
+      "beforeBytes": 11136,
+      "afterBytes": 10605
+    },
+    {
+      "file": "lion_dungeon_poacher_shoulder.cloth.json",
+      "beforeBytes": 23689,
+      "afterBytes": 13435
+    },
+    {
+      "file": "lion_dungeon_poacher_shoulder.attach.json",
+      "beforeBytes": 126,
+      "afterBytes": 115
+    },
+    {
+      "file": "lion_dungeon_poacher_weapon.cloth.json",
+      "beforeBytes": 3242,
+      "afterBytes": 1922
+    },
+    {
+      "file": "lion_dungeon_poacher_weapon.attach.json",
+      "beforeBytes": 120,
+      "afterBytes": 105
+    },
+    {
+      "file": "lion_ti8_arm_alt.attach.json",
+      "beforeBytes": 678,
+      "afterBytes": 607
+    }
+  ],
+  "total": {
+    "originalModelAndLoadedTexturesBytes": 18861348,
+    "optimizedAllAssetsBytes": 2574805,
+    "savedPercent": 86.3
+  },
+  "optimization": {
+    "geometry": "Original geometry, skeleton, node names, inverse binds and all facial morphs retained. Morph accessors sparsified losslessly; all dense accessor bytes verified identical.",
+    "animation": "One hero taunt only. All unused head loadout and cosmetic idle clips removed; faithful to showroom playback.",
+    "textures": "512px max; WebP q88 color/masks, q94 normals; alpha q100. Standard glTF maps only.",
+    "network": "Runtime files contain no references to remote hosts."
+  },
+  "packedModels": {
+    "assets/lion.glb": "assets/lion.glb.gz",
+    "assets/lion_dungeon_poacher_back.glb": "assets/lion_dungeon_poacher_back.glb.gz",
+    "assets/lion_dungeon_poacher_wearable.glb": "assets/lion_dungeon_poacher_wearable.glb.gz",
+    "assets/lion_dungeon_poacher_shoulder.glb": "assets/lion_dungeon_poacher_shoulder.glb.gz",
+    "assets/lion_dungeon_poacher_weapon.glb": "assets/lion_dungeon_poacher_weapon.glb.gz",
+    "assets/lion_ti8_arm_alt.glb": "assets/lion_ti8_arm_alt.glb.gz"
+  },
+  "packing": {
+    "format": "gzip",
+    "decoder": "Native browser DecompressionStream, with raw GLB fallback",
+    "originalModelBytes": 1977308,
+    "packedModelBytes": 892590,
+    "savedBytes": 1084718,
+    "savedPercent": 54.9,
+    "models": [
+      {
+        "source": "assets/lion.glb",
+        "packed": "assets/lion.glb.gz",
+        "originalBytes": 755964,
+        "packedBytes": 335867
+      },
+      {
+        "source": "assets/lion_dungeon_poacher_back.glb",
+        "packed": "assets/lion_dungeon_poacher_back.glb.gz",
+        "originalBytes": 183928,
+        "packedBytes": 84462
+      },
+      {
+        "source": "assets/lion_dungeon_poacher_wearable.glb",
+        "packed": "assets/lion_dungeon_poacher_wearable.glb.gz",
+        "originalBytes": 403756,
+        "packedBytes": 183280
+      },
+      {
+        "source": "assets/lion_dungeon_poacher_shoulder.glb",
+        "packed": "assets/lion_dungeon_poacher_shoulder.glb.gz",
+        "originalBytes": 201152,
+        "packedBytes": 90478
+      },
+      {
+        "source": "assets/lion_dungeon_poacher_weapon.glb",
+        "packed": "assets/lion_dungeon_poacher_weapon.glb.gz",
+        "originalBytes": 112332,
+        "packedBytes": 45001
+      },
+      {
+        "source": "assets/lion_ti8_arm_alt.glb",
+        "packed": "assets/lion_ti8_arm_alt.glb.gz",
+        "originalBytes": 320176,
+        "packedBytes": 153502
+      }
+    ]
+  }
+}

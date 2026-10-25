@@ -1,4 +1,4 @@
-# Who Ruined v6.5
+# Who Ruined v6.7
 
 Match ID → OpenDota → role-aware match analysis → verdict.
 
@@ -46,3 +46,10 @@ Match ID → OpenDota → role-aware match analysis → verdict.
   - Spirit Vessel / Essence Distiller — героям из VESSEL_H; Force Staff — любому саппорту (штраф и замечание, если нет); барабаны ИЛИ Меку (одно из двух) — героям из TEAMITEM_H; Blink Dagger — только героям из BLINK_H (штраф и замечание, если нет).
   - Непотраченное золото больше не упоминается и не влияет на оценку.
 - v6.5: Hurricane Pike больше не засчитывается саппортам вместо Force Staff — совет и штраф за отсутствие именно Force Staff.
+- v6.6: рекламные баннеры Skin Space × Collectors Cache (комплект партнёра от 23.10.2026, лежит в `ads/`, хеши сверены, код проверен):
+  - ПК (экран ≥1180px): интерактивный 3D-Лион 360×490 справа от шапки (iframe, вариант 2 из инструкции: `sandbox` без `allow-same-origin`).
+  - Мобильные и планшеты (<1180px): статичный баннер 360×105 (WebP) под кнопками Телеграм/BetBoom, перед строкой статуса. Вся картинка — ссылка на https://collectorscache.ru/.
+  - Под баннерами подпись «Реклама». Подключение — `js/ads.js` (iframe/картинка создаются скриптом, поэтому на нужном экране грузится только один из двух).
+  - ВАЖНО: Лиону нужен заголовок `Access-Control-Allow-Origin: *` на папке `/ads/` (иначе виден только постер). Cloudflare Pages/Netlify — файл `_headers` уже в корне; GitHub Pages отдаёт его сам; nginx — блок `location ^~ /ads/` из `ads/Установка.txt`.
+  - Локальная проверка: `python3 serve.py` → http://localhost:8080 (двойной клик по index.html не подходит — модели грузятся через fetch).
+- v6.7: по просьбе партнёра на оба баннера добавлена ссылка с UTM-меткой `https://collectorscache.ru/?utm_source=who_ruined&utm_medium=banner&utm_campaign=who_ruined&utm_content=skinspace_collectors`: кнопка «Открыть маркет» в ПК-баннере (`ads/lion-banner-cards/index.html`) и вся картинка мобильного баннера (`js/ads.js`, константа MARKET_URL). Файл index.html баннера изменён намеренно — его хеш в SHA256SUMS партнёра больше не совпадает.

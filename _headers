@@ -1,0 +1,6 @@
+# Cloudflare Pages / Netlify: CORS только для публичной папки с рекламой (нужно для iframe без allow-same-origin)
+/ads/*
+  Access-Control-Allow-Origin: *
+  Cross-Origin-Resource-Policy: cross-origin
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: no-referrer
