@@ -64,7 +64,7 @@ function defenseHtml(){
  const dr=rk(x=>x.hero_damage||0),tr=rk(x=>x.tower_damage||0),pro=[],ctx=[],con=[];
  if(p.kp>=60)pro.push([`Участие в ${p.kp.toFixed(0)}% убийств команды`,'Он был в гуще событий, а не пассивно фармил.']);
  if(dr<=2)pro.push([`№${dr} по урону героям в команде`,`${fmt(p.hero_damage)} урона — ${p.dmgShare.toFixed(1)}% командного.`]);
- if((p.tower_damage||0)>0&&tr<=2)pro.push([`№${tr} по урону строениям`,`${fmt(p.tower_damage)} урона по зданиям.`]);
+ if(!isSupRole(p)&&(p.tower_damage||0)>0&&tr<=2)pro.push([`№${tr} по урону строениям`,`${fmt(p.tower_damage)} урона по зданиям.`]);
  if((p.deaths||0)<=avgD-1)pro.push(['Умирал реже среднего',`${p.deaths||0} смертей при среднем ${avgD.toFixed(1)} по команде.`]);
  if(rk(x=>x.gold_per_min||0)===1)pro.push(['Лучший фарм в команде',`${fmt(p.gold_per_min)} GPM.`]);
  if((p.hero_healing||0)>3000||(p.obs_placed||0)>=5)pro.push(['Вклад поддержки','Лечение и вижен помогали команде, даже если это не видно в KDA.']);
@@ -76,13 +76,13 @@ function defenseHtml(){
  if(p.kp<40)con.push(['Мало участия в боях',`Всего ${p.kp.toFixed(0)}% убийств команды с его участием.`]);
  if(dr>=n-1)con.push(['Один из самых низких уронов',`${fmt(p.hero_damage)} урона героям — ${p.dmgShare.toFixed(1)}% командного.`]);
  (p.reasons||[]).slice(0,4).forEach(x=>{const c=cleanReason(x);if(!con.some(y=>y[0].toLowerCase()===c[0].toLowerCase()))con.push(c)});
- const sc=p.score,strong=pro.length+ctx.length;let cls,title,text;
- if(sc>=70&&strong<=1){cls='no';title='Оправдать не получится';text=`Влияние на поражение ${sc}/100 — одно из самых высоких, а смягчающих обстоятельств по данным почти нет. Честно: по статистике оправдать этого игрока не выйдет.`}
- else if(sc>=70){cls='part';title='Оправдать можно лишь отчасти';text=`Вина всё равно высокая (${sc}/100), но есть факторы, которые её немного смягчают. Полностью оправдать нельзя, но он не единственная причина поражения.`}
- else if(sc>=45){cls='mid';title='Скорее частично оправдан';text=`Оценка средняя (${sc}/100): ошибки есть, но они не выглядят решающими${strong?', а в защиту есть реальные аргументы':''}.`}
- else{cls='ok';title='Оправдан';text=`Оценка низкая (${sc}/100): по статистике серьёзной вины на нём нет, поражение скорее командное.`}
+ const sc=p.score,R=rankOf(sc).label,strong=pro.length+ctx.length;let cls,title,text;
+ if(sc>=70&&strong<=1){cls='no';title='Оправдать не получится';text=`Ранг игры ${R} — один из самых низких в матче, а смягчающих обстоятельств по данным почти нет. Честно: по статистике оправдать этого игрока не выйдет.`}
+ else if(sc>=70){cls='part';title='Оправдать можно лишь отчасти';text=`Ранг игры всё равно низкий (${R}), но есть факторы, которые её немного смягчают. Полностью оправдать нельзя, но он не единственная причина поражения.`}
+ else if(sc>=45){cls='mid';title='Скорее частично оправдан';text=`Ранг игры средний (${R}): ошибки есть, но они не выглядят решающими${strong?', а в защиту есть реальные аргументы':''}.`}
+ else{cls='ok';title='Оправдан';text=`Ранг игры высокий (${R}): по статистике серьёзной вины на нём нет, поражение скорее командное.`}
  const li=a=>a.map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join('');
- return`<div class="advHead"><img src="${esc(heroImg(p))}" alt=""><div><b>${esc(p.personaname||'Игрок')}</b><span>${esc(heroName(p))} · ${esc(impactLabel(sc))}</span></div><div class="advScore">${sc}<small>/100</small></div></div>`
+ return`<div class="advHead"><img src="${esc(heroImg(p))}" alt=""><div><b>${esc(p.personaname||'Игрок')}</b><span>${esc(heroName(p))} · ${esc(impactLabel(sc))}</span></div><div class="advScore">${rankBadge(sc,52)}</div></div>`
   +`<div class="advCols"><div class="advCol pro"><h3>Что говорит в его защиту</h3>${strong?`<ul>${li(pro.concat(ctx))}</ul>`:'<p class="advEmpty">По статистике защитить почти нечем.</p>'}</div><div class="advCol con"><h3>Чего не оправдать</h3>${con.length?`<ul>${li(con)}</ul>`:'<p class="advEmpty">Явных претензий по статистике нет.</p>'}</div></div>`
   +`<div class="advVerdict ${cls}"><b>${esc(title)}</b><p>${esc(text)}</p></div><p class="advNote">Вывод строится только на статистике матча. Он не видит коммуникацию, решения команды и ситуации в драках, которых нет в данных OpenDota.</p>`}
 function openModal(id,html){const el=$(id);if(html!=null)$('advContent').innerHTML=html;el.classList.remove('hidden');applyLang(el)}
@@ -94,7 +94,7 @@ $('draftBtn').onclick=()=>{if(!CUR)return;track('click/draft');openModal('draftM
 /* ---- history ---- */
 function histGet(){try{return JSON.parse(localStorage.getItem('wr_hist')||'[]')}catch(e){return[]}}
 function histAdd(e){const h=histGet().filter(x=>x.id!==e.id);h.unshift(e);try{localStorage.setItem('wr_hist',JSON.stringify(h.slice(0,8)))}catch(_){}histRender()}
-function histRender(){const h=histGet();$('history').innerHTML=h.length?`<span>${t('Недавние')}:</span>`+h.map(x=>`<button type="button" class="chip" data-id="${esc(x.id)}" title="${esc(x.name+' · '+x.hero)}">${esc(x.id)} <b>${esc(x.score)}</b></button>`).join('')+'<button type="button" class="chip clr" data-clr="1" aria-label="Clear">✕</button>':''}
+function histRender(){const h=histGet();$('history').innerHTML=h.length?`<span>${t('Недавние')}:</span>`+h.map(x=>`<button type="button" class="chip" data-id="${esc(x.id)}" title="${esc(x.name+' · '+x.hero)}">${esc(x.id)} ${rankBadge(+x.score||0,18)}</button>`).join('')+'<button type="button" class="chip clr" data-clr="1" aria-label="Clear">✕</button>':''}
 $('history').addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;if(b.dataset.clr){try{localStorage.removeItem('wr_hist')}catch(_){}histRender()}else run(b.dataset.id)});
 
 /* ---- parse request ---- */
@@ -116,8 +116,8 @@ async function shareCard(){
  const name=p.personaname||'Unknown';let fs=88;x.fillStyle='#fff';do{x.font=`900 ${fs}px Inter,Arial,sans-serif`;fs-=4}while(x.measureText(name).width>940&&fs>28);x.fillText(name,540,625);
  x.fillStyle='#9aa4b6';x.font='600 34px Inter,Arial,sans-serif';x.fillText(heroName(p),540,682);
  x.fillStyle=({'very-high':'#ff3b47',high:'#ff6a3d',moderate:'#ffb02e',low:'#7bb7ff',minimal:'#6ad39a'})[impactClass(p.score)];x.font='900 64px Inter,Arial,sans-serif';x.fillText(impactLabel(p.score),540,790);
- x.fillStyle='rgba(255,255,255,.1)';x.fillRect(190,820,700,14);x.fillStyle=x.fillStyle;g=x.createLinearGradient(190,0,890,0);g.addColorStop(0,'#ffb02e');g.addColorStop(1,'#ff3b47');x.fillStyle=g;x.fillRect(190,820,7*p.score,14);
- x.fillStyle='#c9d1df';x.font='700 32px Inter,Arial,sans-serif';x.fillText(`K/D/A ${p.kills||0}/${p.deaths||0}/${p.assists||0}  ·  GPM ${fmt(p.gold_per_min)}  ·  KP ${p.kp.toFixed(0)}%`,540,910);
+ const rimg=await loadImg('assets/ranks/'+rankOf(p.score).file+'.png');if(rimg)x.drawImage(rimg,480,812,120,120);
+ x.fillStyle='#c9d1df';x.font='700 32px Inter,Arial,sans-serif';x.fillText(`K/D/A ${p.kills||0}/${p.deaths||0}/${p.assists||0}  ·  GPM ${fmt(p.gold_per_min)}  ·  KP ${p.kp.toFixed(0)}%`,540,985);
  x.fillStyle='#5f6a7d';x.font='600 24px Inter,Arial,sans-serif';x.fillText(shareUrl(m.match_id||'').replace(/^https?:\/\//,''),540,1030);
  c.toBlob(async b=>{if(!b)return;const f=new File([b],`who-ruined-${m.match_id}.png`,{type:'image/png'});
   if(navigator.canShare&&navigator.canShare({files:[f]})){try{await navigator.share({files:[f]});return}catch(e){}}

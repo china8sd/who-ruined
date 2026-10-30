@@ -141,11 +141,12 @@ function scorePlayer(p,c){
  let errorPenalty=Math.min(24,deaths*1.9*lateFactor);
  if(duration>35*60 && deaths>=2 && !(p.buyback_log||[]).length) errorPenalty+=3;
  const objectiveTarget={"Pos 1 · Carry":1100,"Pos 2 · Mid":900,"Pos 3 · Offlane":1200,"Pos 4 · Soft Support":700,"Pos 5 · Hard Support":500}[role]||900;
- const objectivePenalty=clamp((objectiveTarget-(p.tower_damage||0))/110,0,11);
+ const isSup=/Pos [45]/.test(role); /* у саппортов урон по строениям не учитывается */
+ const objectivePenalty=isSup?0:clamp((objectiveTarget-(p.tower_damage||0))/110,0,11);
  const utility=((p.hero_healing||0)/500)+(p.obs_placed||0)*1.5+(p.sentry_placed||0)*.8;
  const utilityCredit=clamp(utility,0,10);
  // Resource-to-impact waste: high economy with weak fight/objective conversion increases blame.
- const resourceWaste=(farm>expectedGpm+80 && (dmgShare<expectedDamage*100*.72) && (p.tower_damage||0)<objectiveTarget*.7)?7:0;
+ const resourceWaste=(!isSup&&farm>expectedGpm+80 && (dmgShare<expectedDamage*100*.72) && (p.tower_damage||0)<objectiveTarget*.7)?7:0;
  const ix=itemSignals(p,c,role);
  const raw=100*(w.farm*(farmGap/18)+w.fight*(fightPenalty/33)+w.error*(errorPenalty/27)+w.obj*(objectivePenalty/11)+w.utility*Math.max(0,(6-utilityCredit)/6));
  const score=clamp(raw+resourceWaste+ix.reduce((a,x)=>a+x.pen,0),0,100);
@@ -167,7 +168,7 @@ function scorePlayer(p,c){
 function render(m,all,players,culprit,closeRuiner){
  $("result").classList.remove("hidden");
  $("culpritHero").src=heroImg(culprit); $("culpritRank").src=rankImg(culprit.rank_tier); $("culpritRankText").textContent=rankName(culprit.rank_tier);
- $("culpritName").textContent=culprit.personaname||`Игрок ${culprit.idx+1}`;
+ $("culpritName").innerHTML=esc(culprit.personaname||`Игрок ${culprit.idx+1}`)+rankBadge(culprit.score,40);
  $("culpritScore").textContent=impactLabel(culprit.score); $("culpritScore").className=`impactValue ${impactClass(culprit.score)}`; $("confidence").textContent=`Уверенность модели: ${culprit.confidence}%`;
  $("summary").innerHTML=verdictText(m,culprit,closeRuiner);
  $("whyRuinerContent").innerHTML=culprit.reasons.map(r=>`<div class="reason"><strong>${esc(r[0].replace(/ для (Pos [1-5].*)$/,"").replace(/Pos [1-5] · (Carry|Mid|Offlane|Soft Support|Hard Support)/g,"роль"))}</strong><span>${esc(r[1].replace(/для Pos [1-5] · (Carry|Mid|Offlane|Soft Support|Hard Support)/g,"с учётом роли"))}</span></div>`).join("") || '<div class="empty">Недостаточно отдельных сигналов, чтобы объяснить оценку подробнее.</div>';
@@ -176,13 +177,17 @@ function render(m,all,players,culprit,closeRuiner){
  const winnerTeamForAwards=m.radiant_win?"Radiant":"Dire";
  const winnerPlayersForAwards=all.filter(p=>p.team===winnerTeamForAwards).map(p=>({...p,roleInfo:inferRole(p,all.filter(x=>x.team===winnerTeamForAwards),m.duration||1)}));
  const mvp=winnerPlayersForAwards.slice().sort((a,b)=>awardScore(b)-awardScore(a))[0];
+ // MVP матча всегда получает максимальный ранг оценки S+ во всех карточках игроков.
+ const mvpSlot=mvp?.player_slot;
+ all.forEach(p=>{p.isMvp=mvpSlot!=null&&p.player_slot===mvpSlot});
+ players.forEach(p=>{p.isMvp=mvpSlot!=null&&p.player_slot===mvpSlot});
  const bestLoser=players.slice().sort((a,b)=>awardScore(b)-awardScore(a))[0];
  const anti=culprit;
  $("resultSubtitle").textContent=`${time(m.duration)} · ${winnerTeamForAwards} победили со счётом ${m.radiant_win?fmt(m.radiant_score):fmt(m.dire_score)} : ${m.radiant_win?fmt(m.dire_score):fmt(m.radiant_score)}`;
  $("awards").innerHTML=[awardCard('MVP МАТЧА',mvp,'good','Лучший вклад в победившей команде'),awardCard('ЛУЧШИЙ В ПОРАЖЕНИИ',bestLoser,'neutral','Сильнейший профиль среди проигравших'),awardCard('САМЫЙ РИСКОВЫЙ ИГРОК',anti,'bad','Наибольшее число негативных сигналов')].join('');
  $("goldGraph").innerHTML=goldAdvantageGraph(m,all,culprit);
  $("roleCompare").innerHTML=roleComparison(all,players,m);
- $("shareResult").onclick=()=>{const text=`WHO RUINED? | Match ${m.match_id||$('matchId').value}\nПобедитель: ${winnerTeamForAwards}\nMVP: ${mvp?.personaname||heroName(mvp||{})} (${heroName(mvp||{})})\nЛучший в поражении: ${bestLoser?.personaname||heroName(bestLoser||{})}\nСамый рискованный: ${anti?.personaname||heroName(anti||{})} — ${anti?.score??'—'}\nРазбор: ${shareUrl(m.match_id||$('matchId').value)}`; if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>{$('shareResult').textContent='СКОПИРОВАНО'}).catch(()=>window.prompt('Скопируй результат',text));else window.prompt('Скопируй результат',text);};
+ $("shareResult").onclick=()=>{const text=`WHO RUINED? | Match ${m.match_id||$('matchId').value}\nПобедитель: ${winnerTeamForAwards}\nMVP: ${mvp?.personaname||heroName(mvp||{})} (${heroName(mvp||{})})\nЛучший в поражении: ${bestLoser?.personaname||heroName(bestLoser||{})}\nСамый рискованный: ${anti?.personaname||heroName(anti||{})} — ${anti?rankOf(anti.score).label:'—'}\nРазбор: ${shareUrl(m.match_id||$('matchId').value)}`; if(navigator.clipboard?.writeText)navigator.clipboard.writeText(text).then(()=>{$('shareResult').textContent='СКОПИРОВАНО'}).catch(()=>window.prompt('Скопируй результат',text));else window.prompt('Скопируй результат',text);};
 
  const winningTeam=m.radiant_win?"Radiant":"Dire";
  const winningPlayers=all.filter(p=>p.team===winningTeam).map(p=>({...p,roleInfo:inferRole(p,all.filter(x=>x.team===winningTeam),m.duration||1)}));
@@ -205,19 +210,27 @@ function roleComparison(all,losers,m){const teams={Radiant:all.filter(p=>p.team=
 function metricLine(label,value,detail){return `<div class="vmetric"><span>${esc(label)}</span><b>${esc(value)}</b><small>${esc(detail)}</small></div>`;}
 function impactLabel(score){ if(score>=75)return "Очень высокое"; if(score>=55)return "Высокое"; if(score>=35)return "Умеренное"; if(score>=20)return "Небольшое"; return "Низкое"; }
 function impactClass(score){ if(score>=75)return "very-high"; if(score>=55)return "high"; if(score>=35)return "moderate"; if(score>=20)return "low"; return "minimal"; }
+/* Ранг игры: 8 ступеней D- < D+ < B- < B+ < A- < A+ < S- < S+ (S+ — лучшая игра, D- — худшая; руинер получает D-/D+).
+   Считается из score «вины» (0–100): чем выше вина, тем ниже ранг. Иконки: assets/ranks/*.png */
+const RANKS=[['d-','dm'],['d+','dp'],['b-','bm'],['b+','bp'],['a-','am'],['a+','ap'],['s-','sm'],['s+','sp']];
+const RANK_CUTS=[8,15,25,35,45,55,65]; /* пороги score вины (0–100): ≥65 → D-, ≥55 → D+, ≥45 → B-, ≥35 → B+, ≥25 → A-, ≥15 → A+, ≥8 → S-, иначе S+ */
+function rankOf(score){let k=0;while(k<RANK_CUTS.length&&(score||0)>=RANK_CUTS[k])k++;const i=RANKS.length-1-k;return{i,label:RANKS[i][0].toUpperCase(),file:RANKS[i][1]}}
+function rankBadge(score,size,forceSPlus){const r=forceSPlus?RANKS[7].map((v,i)=>v):rankOf(score),z=size||32;return `<img class="rankBadge" src="assets/ranks/${r.file}.png" width="${z}" height="${z}" alt="${r.label}" title="Ранг игры: ${r.label}">`}
+function isSupRole(p){return /Pos [45]/.test((p&&(p.role||(p.roleInfo&&p.roleInfo.role)))||'')}
+function rankGapText(p,r){if(!r)return 'Для сравнения доступен только основной результат модели.';const a=rankOf(p.score),b=rankOf(r.score);if(a.i===b.i)return `Ближайший по влиянию игрок в том же ранге (${a.label}), поэтому матч нельзя сводить к одному виновному.`;if(b.i-a.i>=2||p.score-r.score>=8)return `Его игра заметно хуже, чем у следующего по влиянию игрока: ранг ${a.label} против ${b.label}.`;return `Разрыв с ближайшим игроком небольшой: ранг ${a.label} против ${b.label}, поэтому матч нельзя сводить к одному виновному.`}
 function verdictText(m,p,r){
- const gap=r?Math.max(0,p.score-r.score):0;
- const lead= r && gap>=8 ? `Он заметно оторвался от следующего игрока по модели: ${gap} баллов.` : r ? `Разрыв с ближайшим по score игроком небольшой — всего ${gap} баллов, поэтому матч нельзя сводить к одной цифре.` : `Для сравнения доступен только основной результат модели.`;
+ const lead=rankGapText(p,r);
  const deathText=(p.deaths||0)>=4?`${p.deaths} смертей — заметный источник потерь темпа, особенно с учётом длительности ${time(m.duration)}.`:(p.deaths||0)>=2?`${p.deaths} смертей добавили команде цену ошибок, но сами по себе не являются главным доказательством.`:`Смертей немного (${p.deaths||0}), поэтому итог не строится только на KDA.`;
  const farmText=`${fmt(p.gold_per_min)} GPM, ${fmt(p.net_worth)} net worth и ${fmt(p.last_hits)} last hits`;
  const fightText=`${p.kp.toFixed(0)}% KP и ${p.dmgShare.toFixed(1)}% командного hero damage`;
  const objText=`${fmt(p.tower_damage)} урона по строениям`;
+ const objMetric=isSupRole(p)?metricLine('Билд',(p.itemNeeds&&p.itemNeeds.length)?`не хватило: ${p.itemNeeds.map(n=>n.i).join(', ')}`:'серьёзных пробелов нет','предметы под ситуацию матча'):metricLine('Объекты',objText,`давление на карту и здания`);
  const reasons=p.reasons.slice(0,3).map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join('');
- return `<div class="verdictCopy"><p><strong>${esc(p.personaname||'Этот игрок')}</strong> сыграл наиболее негативную роль в поражении. Модель сравнивает его показатели с ожидаемыми для <strong>его роли в игре</strong>, а затем проверяет, подтверждается ли провал несколькими независимыми сигналами.</p><p>${esc(lead)} Здесь важен контекст: ${esc(deathText)}</p><div class="vmetrics">${metricLine('Экономика',farmText,`ожидания роли учитываются отдельно`)}${metricLine('Влияние в драках',fightText,`урон + участие в убийствах`)}${metricLine('Объекты',objText,`давление на карту и здания`)}${metricLine('Влияние на поражение',impactLabel(p.score),`оценка модели · уверенность ${p.confidence}%`)}</div><div class="verdictReasons"><h3>Что сильнее всего повлияло</h3><ul>${reasons||'<li><b>Сигналы распределены равномерно</b><span>Нет одного показателя, который объясняет поражение целиком.</span></li>'}</ul></div></div>`;
+ return `<div class="verdictCopy"><p><strong>${esc(p.personaname||'Этот игрок')}</strong> сыграл наиболее негативную роль в поражении. Модель сравнивает его показатели с ожидаемыми для <strong>его роли в игре</strong>, а затем проверяет, подтверждается ли провал несколькими независимыми сигналами.</p><p>${esc(lead)} Здесь важен контекст: ${esc(deathText)}</p><div class="vmetrics">${metricLine('Экономика',farmText,`ожидания роли учитываются отдельно`)}${metricLine('Влияние в драках',fightText,`урон + участие в убийствах`)}${objMetric}${metricLine('Ранг игры',rankOf(p.score).label,`влияние на поражение: ${impactLabel(p.score).toLowerCase()} · уверенность ${p.confidence}%`)}</div><div class="verdictReasons"><h3>Что сильнее всего повлияло</h3><ul>${reasons||'<li><b>Сигналы распределены равномерно</b><span>Нет одного показателя, который объясняет поражение целиком.</span></li>'}</ul></div></div>`;
 }
 function nearRuinerHtml(p){
  const rs=p.reasons.slice(0,3).map(x=>`<li><b>${esc(x[0])}</b><span>${esc(x[1])}</span></li>`).join('');
- return `<div class="nearHead"><img src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><div class="nearLabel">БЛИЗКИЙ К РУИНУ ИГРОК</div><h3>${esc(p.personaname||'Unknown')}</h3><p>${esc(heroName(p))}</p></div><strong>${p.score}</strong></div><div class="nearStats"><span>K/D/A <b>${p.kills||0}/${p.deaths||0}/${p.assists||0}</b></span><span>GPM <b>${fmt(p.gold_per_min)}</b></span><span>KP <b>${p.kp.toFixed(0)}%</b></span><span>Hero DMG <b>${fmt(p.hero_damage)}</b></span></div><ul class="nearReasons">${rs}</ul>`;
+ return `<div class="nearHead"><img src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><div class="nearLabel">БЛИЗКИЙ К РУИНУ ИГРОК</div><h3>${esc(p.personaname||'Unknown')}</h3><p>${esc(heroName(p))}</p></div><strong class="nearRank">${rankBadge(p.score,36)}</strong></div><div class="nearStats"><span>K/D/A <b>${p.kills||0}/${p.deaths||0}/${p.assists||0}</b></span><span>GPM <b>${fmt(p.gold_per_min)}</b></span><span>KP <b>${p.kp.toFixed(0)}%</b></span><span>Hero DMG <b>${fmt(p.hero_damage)}</b></span></div><ul class="nearReasons">${rs}</ul>`;
 }
 
 function teamPhaseStats(m,all,start,end,teamName){
@@ -290,8 +303,8 @@ function winnerPlayerCard(p){
 function playerCard(p,isCulprit){
  const kd=`${p.kills||0}/${p.deaths||0}/${p.assists||0}`, items=itemsOf(p);
  return `<div class="playerCard ${isCulprit?'culprit':''}">
-  <div class="playerHead"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><div class="pname">${esc(p.personaname||'Unknown')}${p.leaver?' <span class="leaverTag">ЛИВЕР/АФК</span>':''}</div><div class="heroName">${esc(heroName(p))}</div></div><div class="pScore">${p.score}</div></div>
-  <div class="statgrid"><span>K/D/A <b>${kd}</b></span><span>GPM <b>${fmt(p.gold_per_min)}</b></span><span>XPM <b>${fmt(p.xp_per_min)}</b></span><span>Last Hits <b>${fmt(p.last_hits)}</b></span><span>Hero DMG <b>${fmt(p.hero_damage)}</b></span><span>DMG Share <b>${p.dmgShare.toFixed(1)}%</b></span><span>KP <b>${p.kp.toFixed(0)}%</b></span><span>Tower DMG <b>${fmt(p.tower_damage)}</b></span><span>Net Worth <b>${fmt(p.net_worth)}</b></span><span>Healing <b>${fmt(p.hero_healing)}</b></span><span>Wards <b>${fmt((p.obs_placed||0)+(p.sentry_placed||0))}</b></span><span>Denies <b>${fmt(p.denies)}</b></span></div>
+  <div class="playerHead"><img class="heroIcon" src="${heroImg(p)}" onerror="this.style.visibility='hidden'"><div><div class="pname">${esc(p.personaname||'Unknown')}${p.leaver?' <span class="leaverTag">ЛИВЕР/АФК</span>':''}</div><div class="heroName">${esc(heroName(p))}</div></div><div class="pScore">${rankBadge(p.score,34,p.isMvp)}</div></div>
+  <div class="statgrid"><span>K/D/A <b>${kd}</b></span><span>GPM <b>${fmt(p.gold_per_min)}</b></span><span>XPM <b>${fmt(p.xp_per_min)}</b></span><span>Last Hits <b>${fmt(p.last_hits)}</b></span><span>Hero DMG <b>${fmt(p.hero_damage)}</b></span><span>DMG Share <b>${p.dmgShare.toFixed(1)}%</b></span><span>KP <b>${p.kp.toFixed(0)}%</b></span>${isSupRole(p)?'':`<span>Tower DMG <b>${fmt(p.tower_damage)}</b></span>`}<span>Net Worth <b>${fmt(p.net_worth)}</b></span><span>Healing <b>${fmt(p.hero_healing)}</b></span><span>Wards <b>${fmt((p.obs_placed||0)+(p.sentry_placed||0))}</b></span><span>Denies <b>${fmt(p.denies)}</b></span></div>
   ${buildRow(p)}
  </div>`;
 }

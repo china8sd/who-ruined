@@ -359,3 +359,32 @@ h1.titleBanner img{width:min(100%,532px)}
 .wyTbl th{font-size:10px;letter-spacing:.8px;color:#8b93a4;text-transform:uppercase}.wyTbl td.g{color:#6ad39a;font-weight:800}.wyTbl td.r{color:#ff7a80;font-weight:800}
 .wyList{margin:0;padding-left:18px;display:grid;gap:5px;font-size:12px;line-height:1.5;color:#b7c0cf}.wyList.good li::marker{color:#6ad39a}
 @media(max-width:750px){.wySec .reasons{grid-template-columns:1fr}.wyLeg li{grid-template-columns:10px 1fr auto}.wyLeg small{grid-column:2/-1}.wyTop{flex-direction:column;align-items:flex-start}}
+
+
+/* v6.11 — Interesting facts: match usage */
+.factsCard{width:min(1100px,100%);max-height:90vh;overflow:auto}
+.factsSummary{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
+.factsSummary span{background:#111319;border:1px solid #282d37;border-radius:8px;padding:8px 11px;color:#858c9a;font-size:11px}
+.factsSummary b{color:#eee;margin-left:5px}
+.factsPlayer{background:#0d1016;border:1px solid #252b35;border-radius:12px;padding:13px;margin:10px 0}
+.factsPlayerHead{display:flex;align-items:center;gap:10px;padding-bottom:11px;border-bottom:1px solid #252b35}
+.factsHero{width:42px;height:42px;object-fit:cover;border-radius:8px;background:#202630}
+.factsPlayerHead>div{min-width:0;flex:1}
+.factsPlayerHead b,.factsPlayerHead span{display:block;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.factsPlayerHead b{font-size:13px;color:#f0f2f6}
+.factsPlayerHead span{font-size:10px;color:#858e9e;margin-top:3px}
+.factsPlayerHead>small{font-size:10px;color:#aab3c2;background:#1a202b;padding:5px 8px;border-radius:7px;white-space:nowrap}
+.factsColumns{display:grid;grid-template-columns:1fr 1fr;gap:14px;padding-top:11px}
+.factsColumns h3{font-size:11px;letter-spacing:1px;text-transform:uppercase;color:#9ca7b8;margin:0 0 8px}
+.factsColumns h3 span{color:#657185;margin-left:5px}
+.factsItems{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.factItem{display:flex;align-items:center;gap:7px;min-width:0;background:#151a23;border:1px solid #242b37;border-radius:8px;padding:6px}
+.factItem img{width:30px;height:30px;object-fit:contain;flex:none;background:#090c11;border-radius:5px}
+.factItem span{font-size:10px;color:#c4cbd6;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.factItem b{font-size:11px;color:#fff;white-space:nowrap}
+.factsEmpty,.factsLoading{font-size:11px;color:#778293;padding:8px 0}
+.factsFoot{font-size:10px;line-height:1.5;color:#6f7989;margin:14px 2px 2px}
+.factsBtn{border-color:rgba(115,157,210,.45);color:#b8d5ff;background:rgba(24,43,68,.48)}
+.factsBtn:hover{background:rgba(35,62,96,.72);color:#fff}
+@media(max-width:700px){.factsColumns{grid-template-columns:1fr}.factsItems{grid-template-columns:1fr 1fr}.factsPlayerHead>small{font-size:9px}}
+@media(max-width:420px){.factsItems{grid-template-columns:1fr}.factsPlayer{padding:10px}}

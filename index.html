@@ -4,7 +4,8 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="description" content="Who Ruined — разбор поражения в Dota 2 по Match ID"><meta name="theme-color" content="#05070b">
 <title>Who Ruined — Dota 2 Match Analyzer</title>
-<link rel="stylesheet" href="css/style.css?v=6.8">
+<link rel="stylesheet" href="css/style.css?v=6.11">
+<link rel="stylesheet" href="css/advanced.css?v=6.14">
 <style id="adCss">
 /* реклама Skin Space × Collectors Cache — стили здесь, чтобы раскладка не зависела от кэша style.css */
 .adSlot{display:none}
@@ -19,6 +20,15 @@
  .app>header>.adLion{display:block;grid-column:2;grid-row:1/-1;align-self:start;margin-top:6px}
  .app>header>.adMobile{display:none}
 }
+</style>
+<style id="rankCss">
+.rankBadge{display:inline-block;vertical-align:middle;flex:none;filter:drop-shadow(0 2px 6px rgba(0,0,0,.55))}
+#culpritName .rankBadge{margin-left:12px;width:40px;height:40px;vertical-align:-8px}
+.pScore{display:flex;align-items:center;justify-content:center}.pScore .rankBadge{width:34px;height:34px}
+.nearRank .rankBadge{width:36px;height:36px}
+.chip .rankBadge{width:18px;height:18px;margin-left:6px;vertical-align:-4px}
+.advScore{display:flex;align-items:center}.advScore .rankBadge{width:52px;height:52px}
+.wyBigRank{flex:none}.wyBigRank .rankBadge{width:88px;height:88px}
 </style>
 </head>
 <body>
@@ -41,7 +51,7 @@
 
   <section id="result" class="hidden">
     <div class="verdict">
-      <div class="verdictTop"><div class="eyebrow ruinerEyebrow">РУИНЕР</div><div class="vBtns"><button id="whyRuinerBtn" type="button" class="whyRuinerBtn">ПОЧЕМУ ИМЕННО ОН?</button><button id="advocateBtn" type="button" class="whyRuinerBtn advBtn">ОПРАВДАТЬ РУИНЕРА</button><button id="draftBtn" type="button" class="whyRuinerBtn draftBtn">ЧЕЙ ДРАФТ ЛУЧШЕ?</button><button id="buildBtn" type="button" class="whyRuinerBtn buildBtn">ОЦЕНКА БИЛДОВ</button></div></div>
+      <div class="verdictTop"><div class="eyebrow ruinerEyebrow">РУИНЕР</div><div class="vBtns"><button id="whyRuinerBtn" type="button" class="whyRuinerBtn">ПОЧЕМУ ИМЕННО ОН?</button><button id="factsBtn" type="button" class="whyRuinerBtn factsBtn">ИНТЕРЕСНЫЕ ФАКТЫ</button><button id="deepAnalyticsBtn" type="button" class="whyRuinedBtn deepAnalyticsBtn">ГЛУБОКАЯ АНАЛИТИКА</button><button id="advocateBtn" type="button" class="whyRuinerBtn advBtn">ОПРАВДАТЬ РУИНЕРА</button><button id="draftBtn" type="button" class="whyRuinerBtn draftBtn">ЧЕЙ ДРАФТ ЛУЧШЕ?</button><button id="buildBtn" type="button" class="whyRuinerBtn buildBtn">ОЦЕНКА БИЛДОВ</button></div></div>
       <div class="verdict-grid">
         <div>
           <div class="verdictHero"><img id="culpritHero" src="" alt=""></div><div class="verdictRank"><img id="culpritRank" src="" alt=""><span id="culpritRankText">—</span></div>
@@ -58,6 +68,7 @@
     <div class="panel wide resultScreen"><div class="resultScreenHead"><div><div class="eyebrow">MATCH REPORT</div><h2>Итоги матча</h2><p id="resultSubtitle">Ключевые игроки и переломные моменты</p></div><div class="btnRow"><button id="shareResult" type="button" class="shareBtn">КОПИРОВАТЬ ИТОГ</button><button id="shareCard" type="button" class="shareBtn alt">СКАЧАТЬ КАРТОЧКУ</button></div></div></div>
     <div class="panel wide statsPanel"><div class="panel-title">Матч в цифрах</div><div id="matchOverview"></div><div class="statsDivider"><span>Как менялось преимущество по золоту</span></div><div id="goldGraph" class="goldGraph"></div><div class="graphLegend"><span><i class="radDot"></i> Radiant</span><span><i class="direDot"></i> Dire</span><span><i class="deathDot"></i> Смерти руинера</span><small>График строится по доступным временным данным OpenDota.</small></div></div>
     <div class="panel wide"><div class="panel-title">Сравнение с ожиданиями</div><p class="panelHint">GPM и XPM сопоставляются с контекстным ориентиром модели. Это не абсолютный рейтинг игрока.</p><div id="roleCompare" class="roleCompare"></div></div>
+
     
       <div class="panel wide winnerPanel"><div class="panel-title">Победившая команда · <span id="winnerTeamName">—</span></div><div id="winnerTeam"></div></div>
     <div class="panel wide storyPanel">
@@ -82,11 +93,24 @@
 <div id="whyRuinerModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="whyRuinerTitle"><div class="whyModalBackdrop" data-close-why="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="whyRuinerTitle">Почему именно он?</h2><button id="closeWhyRuiner" type="button" class="closeWhy" aria-label="Закрыть">×</button></div><p class="whyModalIntro">Разбор основан на показателях матча и доступных игровых событиях. Это оценка модели, а не утверждение, что один игрок единолично проиграл матч.</p><div id="whyRuinerContent" class="reasons"></div></div></div>
 <div id="advModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="advTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="advTitle">Оправдать руинера?</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="advContent"></div></div></div>
 <div id="draftModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="draftTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard"><div class="whyModalHead"><h2 id="draftTitle">Чей драфт лучше?</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="draftBox"></div></div></div>
+<div id="deepAnalyticsModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="deepAnalyticsTitle"><div class="whyModalBackdrop" data-close-deep="1"></div><div class="whyModalCard wideCard deepAnalyticsCard"><div class="whyModalHead"><h2 id="deepAnalyticsTitle">Глубокая аналитика матча</h2><button type="button" class="closeWhy" data-close-deep="1" aria-label="Закрыть">×</button></div><p class="whyModalIntro">Восемь дополнительных инструментов для подробного разбора матча. Данные и выводы зависят от того, что OpenDota успела получить и обработать.</p><div id="deepParseState"></div>    <section class="panel wide advancedPanel" id="advancedAnalysis"><div class="advHeader"><div><div class="eyebrow">DEEP MATCH ANALYSIS</div><div class="panel-title">Глубокий разбор матча</div><p class="panelHint">Дополнительные выводы по таймлайнам, логам покупок и событиям OpenDota.</p></div><button id="downloadTikTok" class="shareBtn alt" type="button">СКАЧАТЬ КАРТОЧКУ 9:16</button></div><div class="advGridMain">
+      <article class="advCard"><h3>1. Кто выиграл линии?</h3><div id="advLanes"></div></article>
+      <article class="advCard"><h3>2. Момент перелома</h3><div id="advTurning"></div></article>
+      <article class="advCard"><h3>3. Тайминги предметов</h3><div id="advItems"></div></article>
+      <article class="advCard"><h3>4. Участие в драках</h3><div id="advFights"></div></article>
+      <article class="advCard"><h3>5. Кто кому испортил игру?</h3><div id="advMatchups"></div></article>
+      <article class="advCard"><h3>6. Карточка для TikTok</h3><p>Вертикальная карточка 9:16 с победителем, MVP и ключевыми игроками матча.</p><button id="downloadTikTokInline" class="shareBtn" type="button">Скачать PNG</button></article>
+      <article class="advCard"><h3>7. Самый бесполезный предмет?</h3><div id="advWorstItem"></div></article>
+      <article class="advCard"><h3>8. Идеальная команда матча</h3><div id="advDream"></div></article>
+    </div></section></div></div>
+<div id="factsModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="factsTitle"><div class="whyModalBackdrop" data-close-facts="1"></div><div class="whyModalCard wideCard factsCard"><div class="whyModalHead"><h2 id="factsTitle">Интересные факты</h2><button type="button" class="closeWhy" data-close-facts="1" aria-label="Закрыть">×</button></div><p class="whyModalIntro">Использование способностей и предметов всеми игроками за матч по данным OpenDota.</p><div id="factsBox"></div></div></div>
 <div id="buildModal" class="whyModal hidden" role="dialog" aria-modal="true" aria-labelledby="buildTitle"><div class="whyModalBackdrop" data-close="1"></div><div class="whyModalCard wideCard bvCard"><div class="whyModalHead"><h2 id="buildTitle">Оценка билдов</h2><button type="button" class="closeWhy" data-close="1" aria-label="Закрыть">×</button></div><div id="buildBox"></div></div></div>
-<script src="js/app.js?v=6.8"></script>
-<script src="js/extras.js?v=6.8"></script>
-<script src="js/builds.js?v=6.8"></script>
-<script src="js/why.js?v=6.8"></script>
-<script src="js/ads.js?v=6.8"></script>
+<script src="js/app.js?v=6.14"></script>
+<script src="js/extras.js?v=6.14"></script>
+<script src="js/builds.js?v=6.10"></script>
+<script src="js/why.js?v=6.10"></script>
+<script src="js/ads.js?v=6.10"></script>
+<script src="js/facts.js?v=6.11"></script>
+<script src="js/advanced.js?v=6.14"></script>
 </body>
 </html>

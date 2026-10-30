@@ -1,0 +1,57 @@
+/* v6.13 advanced match analysis */
+.advancedPanel{margin-top:18px}
+.advHeader{display:flex;align-items:flex-start;justify-content:space-between;gap:18px;margin-bottom:18px}
+.advHeader .panel-title{margin:3px 0 7px}
+.advGridMain{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.advCard{min-width:0;background:linear-gradient(145deg,rgba(20,24,33,.98),rgba(12,15,21,.98));border:1px solid #2a303b;border-radius:13px;padding:16px;overflow:hidden}
+.advCard h3{font-size:15px;color:#e8d5b2;margin:0 0 13px;font-weight:800}
+.advCard p{color:#a6adba;font-size:12px;line-height:1.55}
+.advFoot{font-size:11px!important;color:#7f8999!important;line-height:1.55;margin:12px 0 0}
+.advEmpty{background:#10141b;border:1px dashed #343c49;border-radius:9px;padding:13px;color:#9099a8;font-size:12px;line-height:1.5}
+.advGrid{display:grid;grid-template-columns:1fr;gap:9px}
+.advLane{border:1px solid #2b323e;background:#11151d;border-radius:10px;padding:12px}
+.advLaneHead{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.advLaneHead h4{margin:0;color:#e9edf4;font-size:13px}
+.advLaneHead>b{font-size:12px;padding:4px 8px;border-radius:6px;background:#202630}
+.advRadiant{color:#7bb8ff!important}.advDire{color:#e99a88!important}
+.advLaneScore{display:flex;justify-content:space-between;align-items:center;margin-top:10px;color:#8f99a8;font-size:11px}
+.advLaneScore strong{color:#f0f2f6;font-size:16px;font-variant-numeric:tabular-nums}
+.advLane>p{margin:6px 0 8px}
+.advLanePlayers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
+.advPlayer{display:flex;align-items:center;gap:8px;min-width:0;background:#0c1016;border:1px solid #252c37;border-radius:8px;padding:7px}
+.advPlayer>img{width:32px;height:32px;object-fit:cover;border-radius:6px;background:#222936;flex:none}
+.advPlayer>div{min-width:0;flex:1}
+.advPlayer b,.advPlayer span{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.advPlayer b{font-size:11px;color:#e9edf4}.advPlayer span{font-size:10px;color:#7f8998;margin-top:3px}
+.advPlayer>strong{font-size:10px;color:#c8a66d;white-space:nowrap}
+.advHeroMetric{border:1px solid #35404e;background:linear-gradient(120deg,#17202b,#121820);border-radius:10px;padding:15px;display:flex;flex-direction:column;gap:5px}
+.advHeroMetric span{font-size:11px;color:#aab4c3}.advHeroMetric strong{font-size:25px;color:#f2d5a0}.advHeroMetric small{font-size:11px;color:#8994a5}
+.advTimingList{display:flex;flex-direction:column;gap:8px}.advTimingRow{background:#10151c;border:1px solid #28303b;border-radius:9px;padding:8px}
+.advTimingItems{display:flex;gap:7px;flex-wrap:wrap;margin:7px 0 0 40px}
+.advTimingItems>span{display:flex;align-items:center;gap:5px;background:#1b222d;padding:5px 7px;border-radius:6px;max-width:100%}
+.advTimingItems img{width:22px;height:22px;object-fit:contain}.advTimingItems b{font-size:10px;color:#dfe4ec}.advTimingItems small{font-size:10px;color:#c5a46b}
+.advFightList{display:flex;flex-direction:column;gap:7px}.advFightRow{display:grid;grid-template-columns:22px minmax(0,1fr);gap:7px;align-items:center;background:#10151c;border:1px solid #28303b;border-radius:9px;padding:7px}
+.advFightRow>em{font-style:normal;color:#c6a36c;font-weight:800;text-align:center}.advFightStats{grid-column:2;display:flex;align-items:center;gap:5px;flex-wrap:wrap;color:#e1e6ee}.advFightStats b{font-size:11px}.advFightStats small{font-size:9px;color:#7f8998;margin-right:8px}
+.advDuels{display:flex;flex-direction:column;gap:7px}.advDuel{display:grid;grid-template-columns:minmax(0,1fr) auto minmax(0,1fr);gap:6px;align-items:center}.advDuel .advPlayer{padding:5px}.advDuel .advPlayer>strong{font-size:9px}.advArrow{font-size:10px;color:#c9a66a;text-align:center;white-space:nowrap}
+.advWorst{display:flex;align-items:center;gap:13px;background:#11161e;border:1px solid #303743;border-radius:10px;padding:12px}.advWorst>img{width:58px;height:58px;object-fit:contain}.advWorst>div{display:flex;flex-direction:column;gap:4px;min-width:0}.advWorst span{font-size:10px;color:#8d98a8}.advWorst h4{margin:0;color:#f0f2f6;font-size:15px}.advWorst b{color:#d5aa73;font-size:13px}.advWorst small{color:#8993a2;font-size:10px}
+.advDreamTeam{display:flex;flex-direction:column;gap:7px}.advDreamSlot{border:1px solid #2b323d;background:#10151c;border-radius:9px;padding:8px}.advDreamSlot>span{font-size:10px;color:#c7a66f;font-weight:800}.advDreamSlot>.advPlayer{margin-top:5px}.advDreamSlot>small{display:block;color:#8590a0;font-size:10px;margin:5px 0 0 40px}
+@media(max-width:760px){.advGridMain{grid-template-columns:1fr}.advHeader{flex-direction:column}.advHeader button{width:100%}.advDuel{grid-template-columns:minmax(0,1fr) auto minmax(0,1fr)}.advDuel .advPlayer{gap:5px}.advDuel .advPlayer>img{width:25px;height:25px}.advDuel .advPlayer b{font-size:9px}.advDuel .advPlayer span{font-size:8px}.advDuel .advPlayer>strong{font-size:8px}.advArrow{font-size:8px}.advLanePlayers{grid-template-columns:1fr}}
+
+/* v6.14 deep analytics modal */
+.deepAnalyticsBtn{border-color:rgba(199,163,103,.65)!important;background:rgba(72,53,25,.42)!important;color:#e6c58c!important}
+.deepAnalyticsBtn:hover{background:rgba(105,77,35,.65)!important;color:#fff!important}
+.deepAnalyticsCard{width:min(1120px,100%)!important;max-height:90vh!important;border-color:rgba(199,163,103,.38)!important}
+.deepAnalyticsCard .whyModalHead h2{color:#e6c58c}
+.deepAnalyticsCard .advancedPanel{margin-top:0}
+.deepAnalyticsCard .advHeader{margin-bottom:15px}
+.deepParsePending,.deepParseOk{display:flex;gap:13px;align-items:flex-start;border:1px solid #8a6939;background:linear-gradient(120deg,rgba(74,53,27,.36),rgba(31,28,23,.72));border-radius:12px;padding:15px;margin:0 0 17px;color:#e5d5b8}
+.deepParseOk{border-color:#416d55;background:rgba(35,75,51,.22);color:#a9d9b8;font-size:13px}
+.deepParseIcon{font-size:25px;line-height:1.2}
+.deepParseCopy{min-width:0;flex:1}
+.deepParseCopy>strong{font-size:15px;color:#f1d6a4}
+.deepParseCopy p{font-size:12px;line-height:1.55;color:#b9b2a5;margin:7px 0}
+.deepParseCopy p b{color:#e8d2ad}
+.deepParseActions{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 7px}
+.deepParseCopy small{font-size:10px;color:#928b7f;line-height:1.5}
+.deepAnalyticsCard .advGridMain{margin-top:0}
+@media(max-width:760px){.deepAnalyticsCard{max-height:94vh!important;padding:14px!important}.deepParsePending{padding:11px}.deepParseActions button{flex:1 1 100%}}

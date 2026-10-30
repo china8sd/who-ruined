@@ -21,20 +21,20 @@ const PARTS=[
 ];
 
 function sectionScore(C){
- const{players,culprit:p}=C,second=players.find(x=>x!==p&&!x.leaver);
- const gap=second?p.score-second.score:null;
- const pts=PARTS.map(([k,l,d])=>({k,l,d,v:Math.max(0,(p.parts||{})[k]||0)})).filter(x=>x.v>=.5);
+ const{players,culprit:p}=C,second=players.find(x=>x!==p&&!x.leaver),sup=isSupRole(p);
+ const rp=rankOf(p.score),rs=second&&rankOf(second.score);
+ const pts=PARTS.map(([k,l,d])=>({k,l,d,v:Math.max(0,(p.parts||{})[k]||0)})).filter(x=>x.v>=.5&&!(sup&&x.k==='obj'));
  const sum=pts.reduce((a,x)=>a+x.v,0)||1;
  const cols=['#ff5d66','#ff8f5e','#ffc766','#7bb7ff','#a98bff','#6ad3c4','#c4cbd8'];
  const bar=pts.map((x,i)=>`<i style="width:${x.v/sum*100}%;background:${cols[PARTS.findIndex(q=>q[0]===x.k)]}" title="${esc(x.l)}"></i>`).join('');
  const leg=pts.sort((a,b)=>b.v-a.v).map(x=>`<li><span class="dot" style="background:${cols[PARTS.findIndex(q=>q[0]===x.k)]}"></span><b>${esc(x.l)}</b><em>${Math.round(x.v/sum*100)}%</em><small>${esc(x.d)}</small></li>`).join('');
- return`<div class="wySec"><h3>Из чего сложился балл</h3>
- <div class="wyTop"><div class="wyBig ${impactClass(p.score)}"><b>${p.score}</b><small>/100</small></div><div><b>${esc(impactLabel(p.score))} влияние на поражение</b><p>${second?`№1 из ${players.length} в проигравшей команде. Ближайший — ${esc(nick(second))} (${esc(hn(second))}), отрыв ${gap} ${pl(gap,'балл','балла','баллов')}.${gap<=5?' Разрыв небольшой — «руинер» здесь условный.':''}`:'Сравнивать не с кем.'} Уверенность модели ${p.confidence}%.</p></div></div>
+ return`<div class="wySec"><h3>Из чего сложился ранг</h3>
+ <div class="wyTop"><div class="wyBigRank">${rankBadge(p.score,88)}</div><div><b>Ранг игры ${rp.label}: ${esc(impactLabel(p.score).toLowerCase())} влияние на поражение</b><p>${second?`Самый низкий ранг среди ${players.length} игроков проигравшей команды. Ближайший — ${esc(nick(second))} (${esc(hn(second))}), ранг ${rs.label}${rs.i===rp.i?': в том же ранге, поэтому «руинер» здесь условный.':Math.abs(rp.i-rs.i)===1?': соседний ранг, разрыв небольшой.':'.'}`:'Сравнивать не с кем.'} Уверенность модели ${p.confidence}%.</p></div></div>
  <div class="wyStack">${bar}</div><ul class="wyLeg">${leg||'<li><b>Ни один штраф не выделяется</b></li>'}</ul></div>`;
 }
 
 function sectionMetrics(C){
- const{players,culprit:p}=C,e=p.exp||{},n=players.length;
+ const{players,culprit:p}=C,e=p.exp||{},n=players.length,sup=isSupRole(p);
  const avgD=players.reduce((a,x)=>a+(x.deaths||0),0)/n;
  const row=(label,val,exp,unit,rk,ratio,hint)=>`<div class="wyRow ${st(ratio)}"><div class="wyRowTop"><b>${label}</b><span>${val}${exp?` <small>/ ориентир ${exp}</small>`:''}</span></div><div class="wyBar"><i style="width:${cl(ratio*100,3,100)}%"></i></div><small>${hint}${rk?` · ${rk}-й из ${n} в команде`:''}</small></div>`;
  const gR=pct(p.gold_per_min||0,e.gpm),dR=pct(p.dmgShare,e.dmg),kR=pct(p.kp,e.kp),oR=pct(p.tower_damage||0,e.obj);
@@ -43,7 +43,7 @@ function sectionMetrics(C){
  +row('Фарм (GPM)',fmt(p.gold_per_min),Math.round(e.gpm),'',rankIn(players,p,x=>x.gold_per_min||0),gR,gR>=.95?'на уровне ожиданий':`${Math.round((1-gR)*100)}% ниже ориентира`)
  +row('Доля урона героям',p.dmgShare.toFixed(1)+'%',e.dmg.toFixed(0)+'%',' ',rankIn(players,p,x=>x.hero_damage||0),dR,`${fmt(p.hero_damage)} урона`)
  +row('Участие в убийствах',p.kp.toFixed(0)+'%',Math.round(e.kp)+'%','',rankIn(players,p,x=>x.kp),kR,`K/A ${p.kills||0}/${p.assists||0}`)
- +row('Урон по строениям',fmt(p.tower_damage),fmt(Math.round(e.obj)),'',rankIn(players,p,x=>x.tower_damage||0),oR,oR>=.95?'давление на карту было':'давление на объекты слабое')
+ +(sup?'':ow('Урон по строениям',fmt(p.tower_damage),fmt(Math.round(e.obj)),'',rankIn(players,p,x=>x.tower_damage||0),oR,oR>=.95?'давление на карту было':'давление на объекты слабое'))
  +row('Смерти',String(p.deaths||0),null,'',0,dRatio,`среднее по команде ${avgD.toFixed(1)} · ${(p.deaths||0)<=avgD?'не больше среднего':'больше среднего'}`)
  +`</div></div>`;
 }
@@ -89,7 +89,7 @@ function sectionDeaths(C){
 }
 
 function sectionOpponent(C){
- const{m,all,culprit:p}=C;
+ const{m,all,culprit:p}=C,sup=isSupRole(p);
  const wt=all.filter(x=>x.team!==p.team),rl=inferRoles(wt,m.duration||1),pos=(inferRoles(all.filter(x=>x.team===p.team),m.duration||1)[p.player_slot]||{}).position;
  const o=wt.find(x=>(rl[x.player_slot]||{}).position===pos);
  if(!o)return'';
@@ -97,7 +97,7 @@ function sectionOpponent(C){
  const at=(x,arr,i)=>Array.isArray(x[arr])&&x[arr].length>i?x[arr][i]:null;
  const early=at(p,'gold_t',10)!=null&&at(o,'gold_t',10)!=null?line('Золото на 10-й минуте',at(p,'gold_t',10),at(o,'gold_t',10))+(at(p,'lh_t',10)!=null&&at(o,'lh_t',10)!=null?line('Last hits на 10-й минуте',at(p,'lh_t',10),at(o,'lh_t',10)):''):'';
  return`<div class="wySec"><h3>Против оппонента на той же позиции</h3><p class="wyHint">${esc(nick(p))} (${esc(hn(p))}) против ${esc(nick(o))} (${esc(hn(o))}). Позиция определена по лайну и ресурсам, поэтому в редких матчах пара может быть не точной.</p>
- <div class="wyTblWrap"><table class="wyTbl"><tr><th></th><th>${esc(hn(p))}</th><th>${esc(hn(o))}</th><th>Разница</th></tr>${early}${line('GPM',p.gold_per_min,o.gold_per_min)}${line('XPM',p.xp_per_min,o.xp_per_min)}${line('Net worth',p.net_worth,o.net_worth)}${line('Last hits',p.last_hits,o.last_hits)}${line('Урон героям',p.hero_damage,o.hero_damage)}${line('Урон по строениям',p.tower_damage,o.tower_damage)}${line('Смерти',p.deaths,o.deaths,false)}</table></div></div>`;
+ <div class="wyTblWrap"><table class="wyTbl"><tr><th></th><th>${esc(hn(p))}</th><th>${esc(hn(o))}</th><th>Разница</th></tr>${early}${line('GPM',p.gold_per_min,o.gold_per_min)}${line('XPM',p.xp_per_min,o.xp_per_min)}${line('Net worth',p.net_worth,o.net_worth)}${line('Last hits',p.last_hits,o.last_hits)}${line('Урон героям',p.hero_damage,o.hero_damage)}${sup?'':line('Урон по строениям',p.tower_damage,o.tower_damage)}${line('Смерти',p.deaths,o.deaths,false)}</table></div></div>`;
 }
 
 function sectionBuild(C){
@@ -116,7 +116,7 @@ function sectionMitigating(C){
  if(gap>8000)out.push(`Вся команда отставала по экономике на ${fmt(gap)} net worth — это не вина одного игрока.`);
  if(players.some(x=>x.leaver))out.push('В команде был ливер/АФК — игра 4 на 5 почти не оставляет шансов.');
  const second=players.find(x=>x!==p&&!x.leaver);
- if(second&&p.score-second.score<=5)out.push(`${nick(second)} набрал почти столько же (${second.score} против ${p.score}) — вина распределена.`);
+ if(second&&rankOf(second.score).i===rankOf(p.score).i)out.push(`${nick(second)} в том же ранге (${rankOf(second.score).label}) — вина распределена.`);
  if(p.kp>=60)out.push(`Участие в ${p.kp.toFixed(0)}% убийств команды — он был в центре событий.`);
  if(C.draft&&C.draft.aw-C.draft.al>1.5)out.push('Драфт был не в пользу команды — часть поражения заложена на пике.');
  if(!out.length)return`<div class="wySec"><h3>Что смягчает вину</h3><p class="wyHint">По статистике смягчающих обстоятельств почти нет.</p></div>`;
@@ -141,7 +141,7 @@ function build(C){
  return parts.join('');
 }
 
-Object.assign(EN,{'Из чего сложился балл':'What the score is made of','Показатели против ориентира':'Stats vs benchmark','Смерти по времени':'Deaths timeline','Против оппонента на той же позиции':'Versus the same-position opponent','Билд':'Build','Что смягчает вину':'Mitigating factors','Что делать иначе':'What to do differently','Ключевые причины':'Key reasons'});
+Object.assign(EN,{'Из чего сложился ранг':'What the rank is made of','Показатели против ориентира':'Stats vs benchmark','Смерти по времени':'Deaths timeline','Против оппонента на той же позиции':'Versus the same-position opponent','Билд':'Build','Что смягчает вину':'Mitigating factors','Что делать иначе':'What to do differently','Ключевые причины':'Key reasons'});
 $('whyRuinerBtn').addEventListener('click',()=>{
  if(!CUR)return;
  const box=$('whyRuinerContent');

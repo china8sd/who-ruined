@@ -29,9 +29,11 @@ const TEAMITEM_H=HS(['rattletrap','ogre_magi','tusk','treant','undying','bounty_
 /* герои, которым нужен Blink Dagger */
 const BLINK_H=HS(['axe','centaur','chaos_knight','doom_bringer','dragon_knight','earthshaker','legion_commander','mars','night_stalker','primal_beast','pudge','slardar','sven','tidehunter','tiny','treant','tusk','skeleton_king','templar_assassin','ursa','dark_seer','lion','oracle','obsidian_destroyer','outworld_destroyer','outworld_devourer','puck','rubick','shadow_demon','tinker','batrider','beastmaster','enigma','magnataur','pangolier','sand_king','snapfire']);
 const BLINK=['blink','swift_blink','arcane_blink','overwhelming_blink'];
-const DRUMS=['ancient_janggo','boots_of_bearing'], MEK=['mekansm','guardian_greaves'], FORCE=['force_staff'], VESSEL=['spirit_vessel','essence_distiller'];
-const PR={'Black King Bar':1,'Force Staff':1,'Blink Dagger':2,'Solar Crest':2,'Glimmer Cape':2,'Pipe of Insight':2,'Crimson Guard':2,'Sentry / Dust / Gem':2,'Monkey King Bar / Bloodthorn':2,'Bloodthorn':2,'Mekansm (→ Guardian Greaves)':3,'Ancient Janggo (→ Boots of Bearing)':3,'Spirit Vessel / Essence Distiller':3};
+const DRUMS=['ancient_janggo','drum_of_endurance','boots_of_bearing'], MEK=['mekansm','guardian_greaves'], FORCE=['force_staff'], VESSEL=['spirit_vessel','essence_distiller'];
+const PR={'Black King Bar':1,'Force Staff':1,'Blink Dagger':2,'Solar Crest':2,'Glimmer Cape':2,'Pipe of Insight':2,'Crimson Guard':2,'Sentry / Dust / Gem':2,'Monkey King Bar / Bloodthorn':2,'Bloodthorn':2,'Mekansm (→ Guardian Greaves)':3,'Drum of Endurance (→ Boots of Bearing)':3,'Spirit Vessel / Essence Distiller':3};
 const CONTROL_ITEMS=['basher','abyssal_blade','sheepstick','orchid','bloodthorn','rod_of_atos','gungir','heavens_halberd'];
+/* герои, которых считаем саппортами для советов (Force Staff, Glimmer, барабаны/Меку), даже без роли Support в данных */
+const SUP_EXTRA=HS(['tusk','earth_spirit','earthshaker','nyx_assassin','spirit_breaker','mirana','windrunner','hoodwink','bounty_hunter','snapfire','ringmaster','largo','marci','ogre_magi','rubick','dark_willow','skywrath_mage']);
 const INVIS_I=['invis_sword','silver_edge'], EVADE_I=['butterfly','radiance'];
 
 const BOOTS=S(['boots','phase_boots','power_treads','arcane_boots','tranquil_boots','travel_boots','travel_boots_2','boots_of_bearing','guardian_greaves']);
@@ -45,7 +47,7 @@ const ILLU_DEF=['crimson_guard','shivas_guard','assault','mjollnir','maelstrom',
 const DETECT=['dust','gem','ward_sentry','ward_dispenser'];
 const MKB=['monkey_king_bar','bloodthorn'];
 const UTILITY=['mekansm','guardian_greaves','glimmer_cape','force_staff','hurricane_pike','ghost','rod_of_atos','spirit_vessel','essence_distiller','solar_crest','medallion_of_courage','lotus_orb','pavise','holy_locket','ancient_janggo','veil_of_discord','pipe','cyclone','wind_waker','aether_lens','octarine_core','sheepstick','orchid','bloodthorn','nullifier','blink','swift_blink','arcane_blink','overwhelming_blink','black_king_bar','shivas_guard','crimson_guard','refresher','aeon_disk','sphere'];
-const CORE_ONLY=S(['bfury','radiance','maelstrom','mjollnir','desolator','greater_crit','butterfly','skadi','satanic','abyssal_blade','monkey_king_bar','moon_shard','rapier','basher','sange_and_yasha','kaya_and_sange','yasha_and_kaya','manta','diffusal_blade','disperser','heart','assault','gungir','armlet']);
+const CORE_ONLY=S(['bfury','radiance','maelstrom','mjollnir','desolator','greater_crit','butterfly','skadi','satanic','abyssal_blade','monkey_king_bar','moon_shard','rapier','basher','sange_and_yasha','kaya_and_sange','yasha_and_kaya','manta','diffusal_blade','disperser','heart','assault','armlet']);
 const SUP_ONLY=S(['mekansm','glimmer_cape','ward_dispenser','tranquil_boots','boots_of_bearing','holy_locket','medallion_of_courage','urn_of_shadows','solar_crest','ancient_janggo','pavise','aether_lens','arcane_boots','spirit_vessel']);
 const CHEAP_OK=S(['ward_dispenser','dust','ward_sentry','ward_observer','smoke_of_deceit','tpscroll','cheese','refresher_shard','moon_shard','aghanims_shard','gem']);
 
@@ -108,6 +110,7 @@ function rateOne(I,TC,G){
  const N=(i,w)=>need.push({i,w:w||'',pr:PR[i]??4});
  const P=(d,t)=>{s+=d;pros.push(t)}, C=(d,t)=>{s+=d;cons.push(t)};
  const core=pos<=3, sup=pos>=4, roles=heroData(p).roles||[], hname=strip(heroData(p).name);
+ const supHero=pos>=4&&(SUP_EXTRA.has(hname)||(roles.includes('Support')&&!roles.includes('Carry')));
  const has=k=>inv.all.has(k);
  if(!inv.main.length&&!inv.bp.length)return{na:true,why:'Нет данных о предметах'};
  if(I.leaver)return{na:true,why:'Ливер/АФК — билд не оценивается'};
@@ -131,8 +134,7 @@ function rateOne(I,TC,G){
 
  /* 2. ботинки */
  const boots=inv.main.concat(inv.bp).find(k=>BOOTS.has(k));
- if(min>=15&&!boots)C(-.8,'Нет ботинок');
- else if(boots&&BASE_BOOTS.has(boots)&&min>=25)C(-.5,'Ботинки не улучшены к ' +min+'-й минуте'),N('Улучшение ботинок','Базовые сапоги на такой минуте — потерянная скорость и характеристики.');
+ if(boots&&BASE_BOOTS.has(boots)&&min>=25)C(-.5,'Ботинки не улучшены к ' +min+'-й минуте'),N('Улучшение ботинок','Базовые сапоги на такой минуте — потерянная скорость и характеристики.');
  else if(boots&&sup&&UTIL_BOOTS.has(boots))P(.3,`Полезные для саппорта ботинки (${nm(boots)})`);
  else if(boots&&core&&['phase_boots','power_treads','travel_boots','travel_boots_2'].includes(boots)&&min>=20)P(.2,`Подходящие ботинки (${nm(boots)})`);
 
@@ -208,7 +210,7 @@ function rateOne(I,TC,G){
  }
 
  /* 9. Solar Crest — всегда этим героям */
- if(SOLAR_H.has(hname)&&(!SOLAR_SUP_ONLY.has(hname)||sup)&&min>=22){
+ if(SOLAR_H.has(hname)&&(!SOLAR_SUP_ONLY.has(hname)||supHero)&&min>=22){
   const ph=Math.round(pf.phys*100);
   if(has('solar_crest'))P(.4,'Solar Crest — усиливает кора: броня и уклонение союзнику, минус брони врагу');
   else{C(-.3,'Нет Solar Crest — а он нужен кору');N('Solar Crest',`Solar Crest полезен для кора: союзнику броня и уклонение, у врага минус брони — кор убивает быстрее и дольше живёт${ph>=50?` (особенно против ${ph}% физического урона)`:''}.`)}
@@ -221,7 +223,7 @@ function rateOne(I,TC,G){
  }
 
  /* 11. саппорты: Force Staff, командный предмет (одно из двух), Glimmer */
- if(sup&&min>=18){
+ if(supHero&&min>=18){
   let sp=false;const gp=(d,t)=>{sp=true;P(d,t)};
   const mg=Math.round(pf.mag*100);
   if(anyOf(inv,FORCE))gp(.3,`${names(FORCE,inv)} — мастхев саппорта: вытаскивает союзников и помогает самому выйти из драки`);
@@ -231,7 +233,7 @@ function rateOne(I,TC,G){
    else if(!(TC.teamD&&TC.teamM)){
     const wantMek=TC.teamD?true:TC.teamM?false:TC.atkCores<2;
     if(wantMek){C(-.25,'Нет командного предмета (Mekansm → Guardian Greaves)');N('Mekansm (→ Guardian Greaves)','Хил и броня на всю команду в драке; особенно выручает, когда враг давит бурстом или в команде мало лечения.')}
-    else{C(-.25,'Нет командного предмета (Ancient Janggo → Boots of Bearing)');N('Ancient Janggo (→ Boots of Bearing)','Скорость и темп атаки всей команде; лучше всего работает, когда несколько героев бьют руками.')}
+    else{C(-.25,'Нет командного предмета (Drum of Endurance → Boots of Bearing)');N('Drum of Endurance (→ Boots of Bearing)','Скорость и темп атаки всей команде; лучше всего работает, когда несколько героев бьют руками.')}
    }
   }
   if(!SOLAR_H.has(hname)&&pf.mag>=.55){
@@ -349,5 +351,18 @@ $('buildBtn').addEventListener('click',()=>{
 modal.addEventListener('click',e=>{if(e.target.dataset.close)modal.classList.add('hidden')});
 document.addEventListener('keydown',e=>{if(e.key==='Escape')modal.classList.add('hidden')});
 window.WRBuilds={evaluate};
+/* Если руинер (или ближайший к руину) — саппорт: убираем «давление на объекты» и вместо него ругаем за недостающие предметы */
+function supportItemReasons(m,all,p){
+ if(!p||!isSupRole(p))return;
+ p.reasons=(p.reasons||[]).filter(r=>!/объект/i.test(r[0]));
+ try{
+  const E=evaluate({m,all}),row=E[p.team].rows.find(x=>x.I.p.player_slot===p.player_slot);
+  const need=(row&&!row.r.na&&row.r.need)||[];
+  p.itemNeeds=need;
+  need.slice(0,2).reverse().forEach(n=>p.reasons.unshift(['Не хватило нужного предмета: '+n.i,n.w||'Предмет, который в этой игре стоило иметь.']));
+ }catch(e){console.error(e)}
+}
+const prevRender=render;
+render=function(m,all,players,culprit,close){supportItemReasons(m,all,culprit);supportItemReasons(m,all,close);return prevRender.apply(this,arguments)};
 applyLang();
 })();
